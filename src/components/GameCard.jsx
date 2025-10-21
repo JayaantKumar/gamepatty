@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 /**
@@ -22,24 +22,41 @@ const getEmbedUrl = (url) => {
   }
 };
 
+
 function GameCard({ game }) {
-  // Get the embed URL for the iframe
-  const embedUrl = getEmbedUrl(game.youtubeUrl);
+  // 1. Create a state variable to track if the card is hovered
+  const [isHovered, setIsHovered] = useState(false);
+
+  // 2. Prepare the different URLs
+  const baseEmbedUrl = getEmbedUrl(game.youtubeUrl);
+  
+  // 3. Create a special URL for autoplay
+  // We add 'autoplay=1' to play, 'mute=1' (REQUIRED by browsers),
+  // and 'controls=0' to hide the YouTube UI for a clean look.
+  const autoplayUrl = `${baseEmbedUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${baseEmbedUrl.split('/').pop()}`;
+
 
   return (
-    <div className="bg-gray-900 rounded-lg overflow-hidden shadow-lg flex flex-col">
-      {/* NEW VIDEO SECTION:
-        We use 'aspect-video' to maintain a 16:9 ratio.
-      */}
+    <div 
+      className="bg-gray-900 rounded-lg overflow-hidden shadow-lg flex flex-col"
+      // 4. Set the hover state when the mouse enters or leaves
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="w-full aspect-video bg-black">
-        {embedUrl ? (
+        {/* 5. CONDITIONAL RENDERING:
+          If hovered AND we have a valid URL, show the iframe.
+          Otherwise, show the static image.
+        */}
+        {isHovered && autoplayUrl ? (
           <iframe
-            src={embedUrl}
+            src={autoplayUrl}
             title={game.title}
             frameBorder="0"
+            // Note the addition of "autoplay" to the allow attribute
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full h-full"
+            className="w-full h-full pointer-events-none" // 'pointer-events-none' makes the iframe "un-clickable" so the hover-off works properly
           ></iframe>
         ) : (
           <img
@@ -56,7 +73,6 @@ function GameCard({ game }) {
           {game.description}
         </p>
         
-        {/* We can hide the old "Watch Trailer" button since the video is embedded */}
         <div className="flex justify-between items-center mt-auto">
           <Link
             to={`/games/${game.slug}`}
@@ -64,16 +80,15 @@ function GameCard({ game }) {
           >
             Learn More
           </Link>
-          {/* You could keep this button or remove it.
-            <a
-              href={game.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-red-600 text-white py-2 px-4 rounded-md text-sm font-bold hover:bg-red-700 transition-colors"
-            >
-              Watch Trailer
-            </a>
-          */}
+          {/* I've re-added the trailer button in case they want to see it with sound */}
+          <a
+            href={game.youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-red-600 text-white py-2 px-4 rounded-md text-sm font-bold hover:bg-red-700 transition-colors"
+          >
+            Watch Trailer
+          </a>
         </div>
       </div>
     </div>

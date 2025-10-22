@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import useGames from '../hooks/useGames';
 import GameCard from './GameCard';
+import GameDetailModal from './GameDetailModal'; // Import the new modal
 
 function GamesList() {
   const { games, loading, error } = useGames();
+  
+  // 1. Add state to track the selected game
+  const [selectedGame, setSelectedGame] = useState(null);
 
   return (
     <section id="games" className="py-16">
@@ -17,9 +21,22 @@ function GamesList() {
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {games.map((game) => (
-            <GameCard key={game.id} game={game} />
+            // 2. Pass a function to the card to set the selected game
+            <GameCard 
+              key={game.id} 
+              game={game} 
+              onCardClick={() => setSelectedGame(game)} 
+            />
           ))}
         </div>
+      )}
+
+      {/* 3. Render the modal IF a game is selected */}
+      {selectedGame && (
+        <GameDetailModal 
+          game={selectedGame} 
+          onClose={() => setSelectedGame(null)} 
+        />
       )}
     </section>
   );

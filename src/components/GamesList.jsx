@@ -7,7 +7,7 @@ const getEmbedUrl = (url) => {
   try {
     const videoId = new URL(url).searchParams.get("v");
     if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
     }
     return "";
   } catch {
@@ -105,12 +105,37 @@ function GamesList() {
                     : game.description}
                 </p>
 
-                <button
-                  onClick={() => setSelectedGame(game)}
-                  className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30"
-                >
-                  View Details
-                </button>
+                {/* Buttons */}
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    onClick={() => setSelectedGame(game)}
+                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30"
+                  >
+                    View Details
+                  </button>
+
+                  {game.androidUrl && (
+                    <a
+                      href={game.androidUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-green-500/30 transition-all"
+                    >
+                      Play on Android
+                    </a>
+                  )}
+
+                  {game.iosUrl && (
+                    <a
+                      href={game.iosUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all"
+                    >
+                      Play on iOS
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -118,10 +143,7 @@ function GamesList() {
 
       {/* Modal */}
       {selectedGame && (
-        <GameDetailModal
-          game={selectedGame}
-          onClose={() => setSelectedGame(null)}
-        />
+        <GameDetailModal game={selectedGame} onClose={() => setSelectedGame(null)} />
       )}
     </section>
   );

@@ -7,7 +7,9 @@
       "imageUrl": "https://images.pexels.com/photos/163036/auto-repair-shop-workshop-wrench-tools-163036.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
       "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "releasedAt": "2024-05-10",
-      "tags": ["Action", "Shooter", "Sci-Fi"]
+      "tags": ["Action", "Shooter", "Sci-Fi"],
+      "androidUrl": "https://play.google.com/store/apps/dev?id=8907523523341403713&hl=en_IN",
+      "iosUrl": "https://apps.apple.com/dk/developer/shubham-kumar-bansod/id1654317041"
     },
     {
       "title": "Echoes of the Void",
@@ -16,7 +18,9 @@
       "imageUrl": "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
       "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "releasedAt": "2024-10-31",
-      "tags": ["Horror", "Puzzle", "Atmospheric"]
+      "tags": ["Horror", "Puzzle", "Atmospheric"],
+      "androidUrl": "https://play.google.com/store/apps/dev?id=8907523523341403713&hl=en_IN",
+      "iosUrl": "https://apps.apple.com/dk/developer/shubham-kumar-bansod/id1654317041"
     }
   ],
   "news": [

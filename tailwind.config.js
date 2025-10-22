@@ -7,13 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-red': '#FF4747',
-        'brand-orange': '#FF8C32',
-        'brand-dark': '#0E0E0E',
-        'surface-dark': '#1C1C1C',
-        'text-light': '#E6E6E6',
-        'text-muted': '#A8A8A8',
-        'brand-yellow': '#FFD34D',
+        // These are your new, simple color names
+        'primary': '#000000',
+        'surface': '#3D0000',
+        'accent': '#950101',
+        'highlight': '#FF0000',
+        'text': '#EAEAEA',
+        'muted': '#B3B3B3',
+      },
+      fontFamily: {
+        sans: ['"Inter"', 'sans-serif'],
+      },
+      boxShadow: {
+        'glow': '0 0 12px #FF0000',
+        'glow-md': '0 0 16px #FF0000',
       }
     },
   },

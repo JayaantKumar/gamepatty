@@ -1,32 +1,21 @@
 @import "tailwindcss";
 
 html, body, #root {
-height: 100%;
+  height: 100%;
 }
 
 @layer base {
   body {
-    @apply font-sans;
+    /* This now uses the v4 variable syntax */
+    @apply font-sans bg-[--color-primary] text-[--color-text];
+    
+    /* Apply the smooth gradient background */
+    background-image: linear-gradient(135deg, #000000 40%, #3D0000 100%);
+    
+    /* Ensure content fills the screen */
+    @apply min-h-screen;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold;
+    @apply font-bold text-white;
   }
 }
-
-
-/* body {
-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-background-color: #05060a;
-color: #e6eef8;
-} */
-
-
-/* Hero cinematic effect */
-/* .hero-gradient {
-background-image: linear-gradient(180deg, rgba(5,6,10,0.6), rgba(5,6,10,0.85));
-} */
-
-
-/* .card-glow {
-box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 40px rgba(255,45,85,0.06);
-} */

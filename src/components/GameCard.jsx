@@ -1,37 +1,34 @@
-import React from 'react';
-// We no longer need 'useState' or 'Link'
+import React from "react";
 
 function GameCard({ game, onCardClick }) {
   return (
-    // We added an onClick to the whole card
-    <div 
-      className="bg-gray-900 rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 cursor-pointer"
+    <div
+      className="bg-[#111] rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,87,34,0.4)] cursor-pointer"
       onClick={onCardClick}
     >
-      {/* This is now just a static image, not a video */}
+      {/* Game Image */}
       <img
-        src={game.imageUrl || 'assets/placeholder.png'}
+        src={game.imageUrl || "assets/placeholder.png"}
         alt={game.title}
-        className="w-full h-48 object-cover"
+        className="w-full h-72 object-cover"
       />
 
-      <div className="p-5">
-        <h3 className="text-2xl font-bold mb-2">{game.title}</h3>
-        <p className="text-gray-400 mb-4 h-20 overflow-hidden">
+      {/* Card Content */}
+      <div className="p-6">
+        <h3 className="text-3xl font-extrabold mb-3 text-white tracking-wide">
+          {game.title}
+        </h3>
+        <p className="text-gray-400 text-lg mb-6 h-24 overflow-hidden leading-relaxed">
           {game.description}
         </p>
+
+        {/* Buttons */}
         <div className="flex justify-between items-center">
-          {/* This button also triggers the modal */}
-          <button
-            className="text-brand-accent font-semibold hover:text-brand-accent/80"
-          >
+          <button className="text-[#ff5722] font-semibold hover:text-[#ff784e] text-lg transition-all">
             Learn More
           </button>
-          
-          {/* This button can also trigger the modal, or you can remove it */}
-          <button
-            className="bg-red-600 text-white py-2 px-4 rounded-md text-sm font-bold hover:bg-red-700 transition-colors"
-          >
+
+          <button className="bg-[#ff5722] text-white py-3 px-6 rounded-lg font-bold hover:bg-[#ff784e] text-base transition-all">
             Watch Trailer
           </button>
         </div>

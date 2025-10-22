@@ -1,36 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
-// You would typically pass props for a dynamic hero image
-const heroImageUrl = "https://images.pexels.com/photos/275033/pexels-photo-275033.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+const heroImages = [
+  "https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_930/b_white/f_auto/q_auto/store/software/switch/70010000094158/a022cbeb7960a3ef9cf3cd1d828c3b990a940efa89ce48d09c671297218d6685",
+  "https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_930/b_white/f_auto/q_auto/store/software/switch/70010000096768/4680935f27bf5b08a5cca25268afca277c7b0f02ff1ccc89e0c86e5be5296c3c",
+];
 
 function HeroBanner() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div
-      className="relative h-[70vh] min-h-[500px] w-full flex items-center justify-center text-center text-white"
-      style={{
-        backgroundImage: `url(${heroImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-black opacity-60"></div>
-      
-      <div className="relative z-10 p-4">
-        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight">
-          Crafting <span className="text-brand-accent">Cinematic</span> Worlds
-        </h1>
-        <p className="text-lg md:text-2xl text-gray-200 mt-4 max-w-2xl mx-auto">
-          We are an independent studio dedicated to building immersive,
-          story-driven experiences.
-        </p>
-        <a
-          href="#games"
-          className="mt-8 inline-block bg-brand-accent text-white font-bold py-3 px-8 rounded-lg text-lg uppercase hover:bg-opacity-90 transition-all"
-        >
-          Explore Our Games
-        </a>
-      </div>
+    <div className="relative h-[85vh] min-h-[600px] w-full overflow-hidden"> 
+      {/* increased height from 70vh to 85vh */}
+      {heroImages.map((src, index) => (
+        <img
+          key={src}
+          src={src}
+          alt={`Hero banner slide ${index + 1}`}
+          loading="lazy"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+            currentIndex === index ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            transform: "scale(1.05)", // slight zoom effect for more immersive look
+          }}
+        />
+      ))}
     </div>
   );
 }

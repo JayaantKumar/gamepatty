@@ -1,7 +1,7 @@
 import React from 'react';
 import HeroBanner from '../components/HeroBanner';
 import GamesList from '../components/GamesList';
-import NewsList from '../components/NewsList';
+import ClientProjects from '../components/ClientProjects';
 
 function HomePage() {
   return (
@@ -9,7 +9,7 @@ function HomePage() {
       <HeroBanner />
       <div className="container mx-auto px-4 py-16">
         <GamesList />
-        <NewsList />
+        <ClientProjects/>
       </div>
     </div>
   );

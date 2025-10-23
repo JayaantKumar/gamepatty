@@ -141,6 +141,59 @@ function GamesList() {
           );
         })}
 
+      {/* Masonry Gallery Section - After all detailed game cards */}
+      {!loading && !error && games.length > 0 && (
+        <div className="mt-32 pt-20 border-t-2 border-red-900/30">
+          <h3 className="text-4xl font-black text-center uppercase mb-16 tracking-wide text-white">
+            Explore All <span className="text-red-500">Our Games</span>
+          </h3>
+          
+          <div className="max-w-7xl mx-auto columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 md:gap-8 space-y-6 md:space-y-8">
+            {games.map((game) => (
+              <div
+                key={`masonry-${game.id}`}
+                onClick={() => setSelectedGame(game)}
+                className="group block break-inside-avoid mb-6 md:mb-8 rounded-3xl overflow-hidden border-2 border-red-900/50 shadow-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-red-600/40 hover:border-red-600 bg-black/40 cursor-pointer"
+              >
+                <div className="relative overflow-hidden">
+                  <img
+                    src={game.imageUrl}
+                    alt={game.title}
+                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  
+                  {/* Bottom gradient for text readability */}
+                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 via-black/60 to-transparent"></div>
+                  
+                  {/* Title at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                    <h4 className="text-xl md:text-2xl font-black text-white text-center tracking-wide drop-shadow-lg">
+                      {game.title}
+                    </h4>
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                {game.tags && game.tags.length > 0 && (
+                  <div className="p-4 bg-black/60">
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {game.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="bg-[#1a0000] text-red-400 font-semibold px-3 py-1 rounded-full text-xs border border-red-900"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {selectedGame && (
         <GameDetailModal game={selectedGame} onClose={() => setSelectedGame(null)} />

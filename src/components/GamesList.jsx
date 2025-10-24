@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-// 1. Import Link from react-router-dom
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 import useGames from "../hooks/useGames";
 import GameDetailModal from "./GameDetailModal";
-import { FaGooglePlay, FaApple } from "react-icons/fa6";
 
 const getEmbedUrl = (url) => {
   if (!url) return "";
   try {
     const videoId = new URL(url).searchParams.get("v");
     if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}`;
     }
     return "";
   } catch {
@@ -25,35 +25,35 @@ function GamesList() {
   return (
     <section
       id="games"
-      className="py-28 px-[5.5rem] bg-gradient-to-b from-black via-[#1a0000] to-[#2b0000]"
+      className="py-20 px-6 sm:px-10 md:px-20 bg-gradient-to-b from-black via-[#1a0000] to-[#2b0000]"
     >
-      <h2 className="text-5xl font-black text-center uppercase mb-20 tracking-wide text-white">
+      {/* Section Header */}
+      <h2 className="text-4xl sm:text-5xl font-black text-center uppercase mb-16 tracking-wide text-white">
         Our <span className="text-red-500">Games</span>
       </h2>
 
-      {loading && <p className="text-center text-lg text-gray-400">Loading games...</p>}
+      {/* Loading / Error States */}
+      {loading && (
+        <p className="text-center text-lg text-gray-400">Loading games...</p>
+      )}
       {error && <p className="text-center text-red-500 text-xl">{error}</p>}
 
+      {/* Games List */}
       {!loading &&
         !error &&
         games.map((game, index) => {
           const embedUrl = getEmbedUrl(game.youtubeUrl);
-          const imagesToShow =
-            game.galleryImages && game.galleryImages.length > 0
-              ? game.galleryImages
-              : [game.imageUrl];
-
           const reverse = index % 2 !== 0;
 
           return (
             <div
               key={game.id}
-              className={`flex flex-col md:flex-row ${
-                reverse ? "md:flex-row-reverse" : ""
-              } items-center mb-32 gap-14`}
+              className={`flex flex-col ${
+                reverse ? "md:flex-row-reverse" : "md:flex-row"
+              } items-center md:items-stretch mb-24 gap-10 md:gap-16`}
             >
-              {/* Left side: Video + Images */}
-              <div className="md:w-1/2 w-full space-y-5">
+              {/* Left: Video or Image */}
+              <div className="md:w-1/2 w-full">
                 {embedUrl ? (
                   <iframe
                     src={embedUrl}
@@ -70,84 +70,119 @@ function GamesList() {
                     className="w-full rounded-3xl shadow-2xl border border-red-900 object-cover aspect-video"
                   />
                 )}
-
-                {/* Mini Gallery (still opens modal) */}
-                <div className="grid grid-cols-3 gap-4">
-                  {imagesToShow.slice(0, 3).map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`${game.title} screenshot ${i + 1}`}
-                      className="rounded-xl object-cover h-36 w-full cursor-pointer hover:opacity-80 transition transform hover:scale-105 duration-300"
-                      onClick={() => setSelectedGame(game)}
-                    />
-                  ))}
-                </div>
               </div>
 
-              {/* Right side: Info */}
-              <div className="md:w-1/2 w-full text-gray-300 text-[1.15rem] leading-relaxed">
-                <h3 className="text-4xl font-extrabold text-white mb-4 tracking-wide">
+              {/* Right: Info aligned with video */}
+              <div className="md:w-1/2 w-full flex flex-col justify-center text-gray-300 text-[1.05rem] sm:text-[1.15rem] leading-relaxed">
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-white mb-5 tracking-wide text-center md:text-left">
                   {game.title}
                 </h3>
 
-                <div className="flex flex-wrap gap-3 mb-6">
+                <div className="flex flex-wrap gap-2 sm:gap-3 mb-5 justify-center md:justify-start">
                   {game.tags?.map((tag) => (
                     <span
                       key={tag}
-                      className="bg-[#1a0000] text-red-400 font-semibold px-4 py-2 rounded-full text-[0.95rem] border border-red-900"
+                      className="bg-[#1a0000] text-red-400 font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[0.9rem] sm:text-[0.95rem] border border-red-900"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-gray-300 mb-8 text-[1.1rem]">
+                <p className="text-gray-300 mb-8 text-[1rem] sm:text-[1.1rem] text-center md:text-left">
                   {game.description.length > 220
                     ? game.description.slice(0, 220) + "..."
                     : game.description}
                 </p>
 
-                <div className="flex flex-wrap gap-4 items-center">
-                  {/* 2. CHANGED: This is now a <Link> component */}
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 justify-center md:justify-start items-center">
+                  {/* View Details */}
                   <Link
                     to={`/specificgame/${game.slug}`}
-                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30"
+                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30 text-center"
                   >
                     View Details
                   </Link>
-                  {/* END OF CHANGE */}
 
-                  {game.androidUrl && (
-                    <a
-                      href={game.androidUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold px-6 py-3 text-lg rounded-xl transition-all"
-                    >
-                      <FaGooglePlay />
-                      <span>Play Store</span>
-                    </a>
-                  )}
+                  {/* Animated App Store + Play Store Buttons */}
+                  <div className="flex gap-3 sm:gap-5 items-center">
+                    {game.iosUrl && (
+                      <motion.a
+                        href={game.iosUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0px 0px 15px rgba(255,255,255,0.15)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
+                      >
+                        <FaApple size={28} className="text-white" />
+                        <div className="flex flex-col text-left leading-tight">
+                          <span className="text-xs text-gray-400">
+                            Download on the
+                          </span>
+                          <span className="text-sm font-semibold text-white">
+                            App Store
+                          </span>
+                        </div>
+                      </motion.a>
+                    )}
 
-                  {game.iosUrl && (
-                    <a
-                      href={game.iosUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold px-6 py-3 text-lg rounded-xl transition-all"
-                    >
-                      <FaApple />
-                      <span>App Store</span>
-                    </a>
-                  )}
+                    {game.androidUrl && (
+                      <motion.a
+                        href={game.androidUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0px 0px 15px rgba(0,255,100,0.15)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
+                      >
+                        <FaGooglePlay size={24} className="text-green-400" />
+                        <div className="flex flex-col text-left leading-tight">
+                          <span className="text-xs text-gray-400">
+                            Get it on
+                          </span>
+                          <span className="text-sm font-semibold text-white">
+                            Google Play
+                          </span>
+                        </div>
+                      </motion.a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
 
-      {/* Modal (still works for the gallery images) */}
+      {/* Masonry Layout – Only Primary Images */}
+      {!loading && !error && games.length > 0 && (
+        <div className="mt-24">
+          <h3 className="text-3xl sm:text-4xl font-bold text-center text-white mb-10">
+            All <span className="text-red-500">Games Gallery</span>
+          </h3>
+
+          <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
+            {games.map((game) => (
+              <img
+                key={game.id}
+                src={game.imageUrl}
+                alt={game.title}
+                className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer"
+                onClick={() => setSelectedGame(game)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
       {selectedGame && (
         <GameDetailModal
           game={selectedGame}

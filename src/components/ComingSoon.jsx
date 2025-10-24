@@ -1,0 +1,46 @@
+import React from 'react';
+import useComingSoon from '../hooks/useComingSoon';
+
+function ComingSoon() {
+  const { games, loading, error } = useComingSoon();
+
+  return (
+    <section 
+      id="coming-soon" 
+      className="py-20 px-6 sm:px-10 md:px-20 bg-gradient-to-b from-[#2b0000] via-[#1a0000] to-black"
+    >
+      <h2 className="text-4xl sm:text-5xl font-black text-center uppercase mb-16 tracking-wide text-white">
+        Coming <span className="text-red-500">Soon</span>
+      </h2>
+
+      {loading && <p className="text-center text-lg text-gray-400">Loading upcoming games...</p>}
+      {error && <p className="text-center text-red-500 text-xl">{error}</p>}
+
+      {!loading && !error && games.length > 0 && (
+        <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+          {games.map((game) => (
+            <a
+              key={game.id}
+              href={game.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer overflow-hidden"
+            >
+              <img
+                src={game.imageUrl}
+                alt={game.title}
+                className="w-full h-auto"
+              />
+            </a>
+          ))}
+        </div>
+      )}
+      
+      {!loading && !error && games.length === 0 && (
+        <p className="text-center text-lg text-gray-400">More games will be announced soon!</p>
+      )}
+    </section>
+  );
+}
+
+export default ComingSoon;

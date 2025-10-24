@@ -18,23 +18,23 @@ const socialLinks = [
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-t from-[#0a0a0a] via-[#1a0000] to-[#2b0000] text-gray-300 pt-28 pb-16 border-t border-red-900 text-[1.25rem] leading-relaxed">
-      <div className="container mx-auto px-[6rem] grid grid-cols-1 md:grid-cols-4 gap-16">
+    <footer className="bg-gradient-to-t from-[#0a0a0a] via-[#1a0000] to-[#2b0000] text-gray-300 pt-24 pb-12 border-t border-red-900 text-[1.1rem] leading-relaxed">
+      <div className="container mx-auto px-6 sm:px-10 md:px-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
         
         {/* Brand / About */}
-        <div>
+        <div className="flex flex-col items-center md:items-start text-center md:text-left">
           <Link to="/" className="inline-block mb-6">
             <img
               src="/assets/gamepatty-logo.png"
               alt="GamePatty Logo"
-              className="h-16 w-auto"
+              className="h-14 sm:h-16 w-auto"
             />
           </Link>
-          <p className="mb-8 text-gray-400 text-[1.15rem]">
+          <p className="mb-8 text-gray-400 text-[1rem] sm:text-[1.05rem]">
             Crafting cinematic worlds.
           </p>
 
-          <div className="flex items-center gap-5 text-3xl">
+          <div className="flex items-center justify-center md:justify-start gap-5 text-2xl sm:text-3xl">
             {socialLinks.map((social) => (
               <a
                 key={social.label}
@@ -42,7 +42,7 @@ function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="text-gray-400 hover:text-[#ff5722] transition-colors"
+                className="text-gray-400 hover:text-[#ff5722] transition-colors duration-300"
               >
                 {social.icon}
               </a>
@@ -51,38 +51,51 @@ function Footer() {
         </div>
 
         {/* Quick Links */}
-        <div>
-          <h4 className="text-3xl font-bold text-white mb-8">Quick Links</h4>
-          <ul className="space-y-4 text-[1.2rem]">
+        <div className="text-center md:text-left">
+          <h4 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">
+            Quick Links
+          </h4>
+          <ul className="space-y-3 sm:space-y-4 text-[1rem] sm:text-[1.1rem]">
             <li>
               <Link to="/#games" className="hover:text-[#ff5722] transition-colors">
                 Our Games
               </Link>
             </li>
+            {/* === REMOVED "News" === */}
             <li>
-              <Link to="/news" className="hover:text-[#ff5722] transition-colors">
-                News
+              {/* === CHANGED "About Us" to a page link === */}
+              <Link to="/about" className="hover:text-[#ff5722] transition-colors">
+                About Us
+              </Link>
+            </li>
+            {/* === REMOVED "Careers" === */}
+            <li>
+              <Link to="/privacy-policy" className="hover:text-[#ff5722] transition-colors">
+                Privacy Policy
               </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-[#ff5722] transition-colors">
-                About Us
-              </a>
+              <Link to="/cookie-policy" className="hover:text-[#ff5722] transition-colors">
+                Cookie Policy
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-[#ff5722] transition-colors">
-                Careers
-              </a>
+              {/* === FIXED LINK === */}
+              <Link to="/terms-of-service" className="hover:text-[#ff5722] transition-colors">
+                Terms of Service
+              </Link>
             </li>
           </ul>
         </div>
 
         {/* Contact Info */}
-        <div>
-          <h4 className="text-3xl font-bold text-white mb-8">Contact Us</h4>
-          <p className="text-[1.15rem]">123 Gaming Street,</p>
-          <p className="text-[1.15rem]">Metropolis, 10001</p>
-          <p className="mt-4 text-[1.15rem]">
+        <div className="text-center md:text-left">
+          <h4 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">
+            Contact Us
+          </h4>
+          <p className="text-[1rem] sm:text-[1.1rem]">123 Gaming Street,</p>
+          <p className="text-[1rem] sm:text-[1.1rem]">Metropolis, 10001</p>
+          <p className="mt-4">
             <a
               href="mailto:hello@gamepatty.com"
               className="hover:text-[#ff5722] transition-colors"
@@ -90,35 +103,25 @@ function Footer() {
               hello@gamepatty.com
             </a>
           </p>
-        </div>
-
-        {/* Newsletter */}
-        <div>
-          <h4 className="text-3xl font-bold text-white mb-8">
-            Join our Newsletter
-          </h4>
-          <p className="mb-6 text-gray-400 text-[1.15rem]">
-            Get the latest updates on our games.
-          </p>
-          <form className="flex">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="bg-[#111] text-white placeholder-gray-500 px-6 py-4 text-lg rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#ff5722] flex-grow"
-            />
-            <button
-              type="submit"
-              className="bg-[#ff5722] text-white font-bold px-8 py-4 text-lg rounded-r-md hover:bg-[#ff7043] transition-all"
+          <p className="mt-2">
+            <a
+              href="tel:+917880006228"
+              className="hover:text-[#ff5722] transition-colors"
             >
-              Sign Up
-            </button>
-          </form>
+              +91 7880006228
+            </a>
+          </p>
         </div>
       </div>
 
       {/* Footer bottom */}
-      <div className="text-center border-t border-red-900 pt-10 mt-20 text-gray-500 text-[1.1rem]">
-        <p>&copy; {new Date().getFullYear()} GamePatty. All rights reserved.</p>
+      <div className="text-center border-t border-red-900 pt-8 mt-16 text-gray-500 text-[0.95rem] sm:text-[1rem]">
+        <p>
+          &copy; {new Date().getFullYear()} <span className="text-white font-semibold">GamePatty</span>. All rights reserved.
+        </p>
+        <p className="mt-3">
+          Built with ❤️ by <span className="text-[#ff5722] font-semibold">GamePatty Studios</span>
+        </p>
       </div>
     </footer>
   );

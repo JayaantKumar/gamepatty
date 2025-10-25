@@ -7,8 +7,9 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
-// 1. Import the new page
 import AboutUsPage from './pages/AboutUsPage';
+// 1. Import the new page component
+import ClientProjectDetailPage from './pages/ClientProjectDetailPage'; 
 
 function App() {
   return (
@@ -19,13 +20,14 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/specificgame/:slug" element={<GameDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-          
-          {/* 2. Add the new route */}
           <Route path="/about" element={<AboutUsPage />} />
+          
+          {/* 2. Add the new route for client projects */}
+          <Route path="/clientproject/:slug" element={<ClientProjectDetailPage />} /> 
+
         </Routes>
       </main>
       <Footer />

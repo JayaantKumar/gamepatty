@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+// 1. Import motion and store icons
+import { motion } from "framer-motion";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 
 const getEmbedUrl = (url) => {
   if (!url) return "";
   try {
     const videoId = new URL(url).searchParams.get("v");
     if (videoId) {
+      // Keep autoplay off for the modal video
       return `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}`;
     }
     return "";
@@ -50,6 +54,7 @@ function GameDetailModal({ game, onClose }) {
 
   return (
     <>
+      {/* Main Modal */}
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
         onClick={onClose}
@@ -108,45 +113,79 @@ function GameDetailModal({ game, onClose }) {
               {game.description}
             </p>
 
-            {/* 🎮 Play Demo Buttons */}
-            <div className="flex gap-5 mb-10">
-              {game.androidUrl && (
-                <a
-                  href={game.androidUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-green-500/30 transition-all"
-                >
-                  Play on Android
-                </a>
-              )}
+            {/* === 2. UPDATED BUTTON STYLES === */}
+            {/* Using motion.a and styles from GamesList.jsx */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mb-10">
               {game.iosUrl && (
-                <a
+                <motion.a
                   href={game.iosUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 15px rgba(255,255,255,0.15)",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
                 >
-                  Play on iOS
-                </a>
+                  <FaApple size={28} className="text-white" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-gray-400">
+                      Download on the
+                    </span>
+                    <span className="text-sm font-semibold text-white">
+                      App Store
+                    </span>
+                  </div>
+                </motion.a>
+              )}
+              {game.androidUrl && (
+                <motion.a
+                  href={game.androidUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 15px rgba(0,255,100,0.15)",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
+                >
+                  <FaGooglePlay size={24} className="text-green-400" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-gray-400">
+                      Get it on
+                    </span>
+                    <span className="text-sm font-semibold text-white">
+                      Google Play
+                    </span>
+                  </div>
+                </motion.a>
               )}
             </div>
+            {/* === END OF BUTTON UPDATE === */}
 
             {/* Gallery */}
             <div>
               <h3 className="text-3xl font-bold mb-5 text-white">Gallery</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {imagesToShow.map((imgUrl, index) => (
+                  // Removed fixed height and object-cover from the image below
                   <div
                     key={index}
                     className="overflow-hidden rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,87,34,0.4)] cursor-pointer relative group"
                     onClick={() => openLightbox(imgUrl, index)}
                   >
+                    {/* === 3. UPDATED IMAGE STYLES === */}
                     <img
                       src={imgUrl}
                       alt={`${game.title} gallery image ${index + 1}`}
-                      className="w-full h-60 object-cover"
+                      // Removed h-60 and object-cover
+                      className="w-full h-auto" 
                     />
+                    {/* === END OF IMAGE UPDATE === */}
+                    
+                    {/* Magnifying glass overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                       <svg
                         className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -179,39 +218,45 @@ function GameDetailModal({ game, onClose }) {
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={closeLightbox}
         >
+          {/* Close button for lightbox */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-10"
+            className="absolute top-4 right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-[70]" // Ensure higher z-index
           >
             &times;
           </button>
 
+          {/* Previous image button */}
           {imagesToShow.length > 1 && (
-            <>
-              <button
-                onClick={showPreviousImage}
-                className="absolute left-4 text-white text-5xl hover:text-[#ff784e] transition-all z-10 bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
-              >
-                ‹
-              </button>
-              <button
-                onClick={showNextImage}
-                className="absolute right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-10 bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
-              >
-                ›
-              </button>
-            </>
+            <button
+              onClick={showPreviousImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-5xl hover:text-[#ff784e] transition-all z-[70] bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
+            >
+              ‹
+            </button>
           )}
 
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-lg bg-black/50 px-4 py-2 rounded-full">
+          {/* Next image button */}
+          {imagesToShow.length > 1 && (
+            <button
+              onClick={showNextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-5xl hover:text-[#ff784e] transition-all z-[70] bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
+            >
+              ›
+            </button>
+          )}
+
+          {/* Image counter */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-lg bg-black/50 px-4 py-2 rounded-full z-[70]">
             {lightboxIndex + 1} / {imagesToShow.length}
           </div>
 
+          {/* The full-size image */}
           <img
             src={lightboxImage}
             alt="Full size"
             className="max-w-[90vw] max-h-[90vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // Stop click from closing lightbox
           />
         </div>
       )}

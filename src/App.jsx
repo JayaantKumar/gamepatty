@@ -10,9 +10,9 @@ import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutUsPage from './pages/AboutUsPage';
 import ClientProjectDetailPage from './pages/ClientProjectDetailPage'; 
 
-// 1. Import the new components
-import UnderdevelopedGamesPage from './pages/UnderdevelopedGamesPage';
-import UnderdevelopedGameDetailPage from './pages/UnderdevelopedGameDetailPage';
+// 1. Import the new portfolio page
+import PortfolioPage from './pages/PortfolioPage';
+// 2. Remove the old 'Underdeveloped' page imports
 
 function App() {
   return (
@@ -32,9 +32,8 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           <Route path="/about" element={<AboutUsPage />} />
           
-          {/* 2. Add the new "hidden" routes */}
-          <Route path="/underdeveloped-games" element={<UnderdevelopedGamesPage />} />
-          <Route path="/underdeveloped-game/:slug" element={<UnderdevelopedGameDetailPage />} />
+          {/* 3. Add the new "hidden" route */}
+          <Route path="/portfolio" element={<PortfolioPage />} />
           
         </Routes>
       </main>

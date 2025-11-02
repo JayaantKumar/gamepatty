@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, where, Timestamp } from 'firebase/firestore';
 
 function useNewReleases() {
   const [games, setGames] = useState([]);
@@ -8,14 +8,26 @@ function useNewReleases() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchNewReleases = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const gamesCollection = collection(db, 'newReleases');
-        // You can change 'title' to a date field if you add one
-        const q = query(gamesCollection, orderBy('title', 'asc')); 
+        // 1. Calculate the date 7 days ago
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const timestampSevenDaysAgo = Timestamp.fromDate(sevenDaysAgo);
+
+        // 2. Query the 'games' collection
+        const gamesCollection = collection(db, 'games');
+        const q = query(
+          gamesCollection,
+          // 3. Where 'createdAt' is newer than 7 days ago
+          where('createdAt', '>=', timestampSevenDaysAgo),
+          // 4. Order by 'createdAt' to show newest first
+          orderBy('createdAt', 'desc')
+        ); 
+        
         const querySnapshot = await getDocs(q);
         
         const gamesList = querySnapshot.docs.map(doc => ({
@@ -32,7 +44,7 @@ function useNewReleases() {
       }
     };
 
-    fetchGames();
+    fetchNewReleases();
   }, []);
 
   return { games, loading, error };

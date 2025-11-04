@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // 1. Import Link
 import useComingSoon from '../hooks/useComingSoon';
 
 function ComingSoon() {
@@ -19,11 +20,10 @@ function ComingSoon() {
       {!loading && !error && games.length > 0 && (
         <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
           {games.map((game) => (
-            <a
+            // 2. Change <a> to <Link>
+            <Link
               key={game.id}
-              href={game.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              to={`/specificgame/${game.slug}`} // 3. Link to the internal detail page
               className="block w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer overflow-hidden"
             >
               <img
@@ -31,7 +31,7 @@ function ComingSoon() {
                 alt={game.title}
                 className="w-full h-auto"
               />
-            </a>
+            </Link>
           ))}
         </div>
       )}

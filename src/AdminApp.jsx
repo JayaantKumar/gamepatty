@@ -1,21 +1,34 @@
 import { Admin, Resource } from "react-admin";
-import { dataProvider, authProvider, storageProvider } from "./firebaseProviders";
+import {
+  dataProvider,
+  authProvider,
+  storageProvider,
+} from "./firebaseProviders";
 
 // Import all your resource components
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
-import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
-import { UnderdevelopedGameList, UnderdevelopedGameEdit, UnderdevelopedGameCreate } from "./resources/UnderdevelopedGames";
+import {
+  ClientProjectList,
+  ClientProjectEdit,
+  ClientProjectCreate,
+} from "./resources/ClientProjects";
+import {
+  UnderdevelopedGameList,
+  UnderdevelopedGameEdit,
+  UnderdevelopedGameCreate,
+} from "./resources/UnderdevelopedGames";
 import { ConfigEdit } from "./resources/Config"; // For Site Settings
 
 // Import icons for the menu
-import GameIcon from '@mui/icons-material/SportsEsports';
-import ClientIcon from '@mui/icons-material/BusinessCenter';
-import DevIcon from '@mui/icons-material/Build';
-import SettingsIcon from '@mui/icons-material/Settings';
+import GameIcon from "@mui/icons-material/SportsEsports";
+import ClientIcon from "@mui/icons-material/BusinessCenter";
+import DevIcon from "@mui/icons-material/Build";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 function AdminApp() {
   return (
     <Admin
+      basename="/admin"
       dataProvider={dataProvider}
       authProvider={authProvider}
       // storageProvider={storageProvider}
@@ -25,9 +38,9 @@ function AdminApp() {
         name="config"
         icon={SettingsIcon}
         edit={ConfigEdit}
-        options={{ label: 'Site Settings' }}
+        options={{ label: "Site Settings" }}
       />
-      
+
       {/* Main Games Collection */}
       <Resource
         name="games"
@@ -36,7 +49,7 @@ function AdminApp() {
         edit={GameEdit}
         create={GameCreate}
       />
-      
+
       {/* Hidden Client Portal Games */}
       <Resource
         name="underdevelopedGames"
@@ -44,9 +57,9 @@ function AdminApp() {
         list={UnderdevelopedGameList}
         edit={UnderdevelopedGameEdit}
         create={UnderdevelopedGameCreate}
-        options={{ label: 'Under Development' }}
+        options={{ label: "Under Development" }}
       />
-      
+
       {/* Client Projects (Masonry) */}
       <Resource
         name="clientProjects"
@@ -54,7 +67,7 @@ function AdminApp() {
         list={ClientProjectList}
         edit={ClientProjectEdit}
         create={ClientProjectCreate}
-        options={{ label: 'Client Projects' }}
+        options={{ label: "Client Projects" }}
       />
     </Admin>
   );

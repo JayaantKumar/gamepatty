@@ -1,15 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
 import { BrowserRouter } from 'react-router-dom'
-import ScrollToTop from './components/ScrollToTop.jsx' // 1. Import the new component
+import './index.css'
 
+// 1. Import both apps
+import SiteApp from './SiteApp.jsx'
+import AdminApp from './AdminApp.jsx'
+
+// 2. Check the URL to decide which app to load
+const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+// 3. Render the correct app
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ScrollToTop /> {/* 2. Add it right here */}
-      <App />
-    </BrowserRouter>
+    {isAdminRoute ? (
+      // If URL is /admin, load the Admin Panel (it has its own router)
+      <AdminApp />
+    ) : (
+      // Otherwise, load the normal website with its router
+      <BrowserRouter>
+        <SiteApp />
+      </BrowserRouter>
+    )}
   </React.StrictMode>,
 )

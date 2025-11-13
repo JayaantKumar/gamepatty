@@ -1,10 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // <-- ADD THIS
+import { getStorage } from "firebase/storage"; // <-- ADD THIS
 
 // TODO: Add your own Firebase configuration
 // Your web app's Firebase configuration
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyAtUSg-_LdrygpLn_trTq2Ms1MqLWoqOmE",
   authDomain: "gamepatty-a4c08.firebaseapp.com",
   projectId: "gamepatty-a4c08",
@@ -18,3 +20,5 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);

@@ -1,22 +1,25 @@
-import { 
-  FirebaseDataProvider, 
-  FirebaseAuthProvider 
-} from 'react-admin-firebase';
 import { firebaseConfig } from './firebase';
+// 1. Import from 'react-admin-firebase', the library that IS installed
+import * as ReactAdminFirebase from 'react-admin-firebase';
 
-// Options for the provider
 const options = {
   logging: true,
-  // This tells it to use the 'games', 'clientProjects', etc. collections
   rootRef: '', 
-  // Enable file upload handling automatically
   dontAddId: true, 
 };
 
-// Create the providers using your config
+// 2. Safely extract the providers from the new library
+const FirebaseDataProvider = 
+  ReactAdminFirebase.default?.FirebaseDataProvider || 
+  ReactAdminFirebase.FirebaseDataProvider;
+
+const FirebaseAuthProvider = 
+  ReactAdminFirebase.default?.FirebaseAuthProvider || 
+  ReactAdminFirebase.FirebaseAuthProvider;
+
+// 3. Export the initialized providers
 export const dataProvider = FirebaseDataProvider(firebaseConfig, options);
 export const authProvider = FirebaseAuthProvider(firebaseConfig, options);
 
-// Note: 'react-admin-firebase' handles storage automatically inside dataProvider,
-// so we don't need a separate storageProvider export for the <Admin> component.
+// 4. Export 'undefined' for storageProvider, as this library handles it automatically
 export const storageProvider = undefined;

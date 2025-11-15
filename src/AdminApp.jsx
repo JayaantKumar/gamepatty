@@ -4,7 +4,6 @@ import { dataProvider, authProvider, storageProvider } from "./firebaseProviders
 // Import all your resource components
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
 import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
-import { UnderdevelopedGameList, UnderdevelopedGameEdit, UnderdevelopedGameCreate } from "./resources/UnderdevelopedGames";
 import { ConfigEdit } from "./resources/Config"; // For Site Settings
 
 // Import icons for the menu
@@ -35,16 +34,6 @@ function AdminApp() {
         list={GameList}
         edit={GameEdit}
         create={GameCreate}
-      />
-      
-      {/* Hidden Client Portal Games */}
-      <Resource
-        name="underdevelopedGames"
-        icon={DevIcon}
-        list={UnderdevelopedGameList}
-        edit={UnderdevelopedGameEdit}
-        create={UnderdevelopedGameCreate}
-        options={{ label: 'Under Development' }}
       />
       
       {/* Client Projects (Masonry) */}

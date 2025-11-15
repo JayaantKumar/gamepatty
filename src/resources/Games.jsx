@@ -4,7 +4,8 @@ import {
   Edit, Create, SimpleForm, TextInput, DateInput,
   ArrayInput, SimpleFormIterator, ImageInput, ImageField,
 } from 'react-admin';
-import { serverTimestamp } from 'firebase/firestore'; 
+// 1. Remove the serverTimestamp import, we don't need it here.
+// import { serverTimestamp } from 'firebase/firestore'; 
 
 export const GameList = () => (
   <List sort={{ field: 'createdAt', order: 'DESC' }}>
@@ -59,9 +60,11 @@ export const GameEdit = () => (
 
 export const GameCreate = () => (
   <Create>
-    {/* Automatically set createdAt, and all links to null */}
+    {/* 2. THE FIX: 
+      Change 'serverTimestamp()' to 'new Date()' 
+    */}
     <SimpleForm defaultValues={{ 
-      createdAt: serverTimestamp(),
+      createdAt: new Date(), // <-- THIS IS THE FIX
       androidUrl: null,
       iosUrl: null,
       liveDemoUrl: null

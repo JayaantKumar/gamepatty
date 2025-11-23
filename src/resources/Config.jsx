@@ -8,29 +8,34 @@ import {
   useNotify,
   useRedirect
 } from 'react-admin';
+import { Navigate } from "react-router-dom"; // Import Navigate
 
-// Custom toolbar with only a Save button
+// Custom toolbar
 const SettingsToolbar = () => (
     <Toolbar>
         <SaveButton alwaysEnable />
     </Toolbar>
 );
 
-// Custom title for the page
 const SettingsTitle = () => 'Site Settings';
+
+// === 1. ADD THIS NEW COMPONENT ===
+// This is a fake "List" that just redirects to the Edit page
+export const ConfigList = () => {
+    return <Navigate to="/config/siteSettings" replace />;
+};
+// =================================
 
 export const ConfigEdit = () => {
   const notify = useNotify();
   const redirect = useRedirect();
 
-  // Custom save function to show a notification
   const onSuccess = () => {
       notify('Settings saved successfully!');
-      redirect(false); // Go back to the main dashboard
+      redirect(false); 
   };
 
   return (
-    // It edits the 'siteSettings' document in the 'config' collection
     <Edit
       id="siteSettings"
       resource="config"
@@ -42,7 +47,9 @@ export const ConfigEdit = () => {
         <NumberInput
           source="newReleaseLimit"
           label="New Release Game Limit"
-          helperText="How many games to show in 'New Releases' (e.Lg., 3)"
+          helperText="How many games to show in 'New Releases' (e.g., 3)"
+          min={1}
+          max={20}
         />
         <NumberInput
           source="newReleaseDays"

@@ -1,24 +1,28 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 
-// 1. Import both apps
+// 1. Import SiteApp normally
 import SiteApp from './SiteApp.jsx'
-import AdminApp from './AdminApp.jsx'
+import ScrollToTop from './components/ScrollToTop.jsx'
 
-// 2. Check the URL to decide which app to load
-const isAdminRoute = window.location.pathname.startsWith('/admin');
+// 2. Check the URL path
+const path = window.location.pathname;
+const isAdminRoute = path.startsWith('/admin');
 
-// 3. Render the correct app
+// 3. Lazy Load AdminApp
+const AdminApp = React.lazy(() => import('./AdminApp.jsx'));
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {isAdminRoute ? (
-      // If URL is /admin, load the Admin Panel (it has its own router)
-      <AdminApp />
+      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-black text-white">Loading Admin...</div>}>
+        <AdminApp />
+      </Suspense>
     ) : (
-      // Otherwise, load the normal website with its router
       <BrowserRouter>
+        <ScrollToTop />
         <SiteApp />
       </BrowserRouter>
     )}

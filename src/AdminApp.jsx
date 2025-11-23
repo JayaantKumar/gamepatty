@@ -1,37 +1,49 @@
+import React, { useEffect } from 'react';
 import { Admin, Resource } from "react-admin";
 import { dataProvider, authProvider } from "./firebaseProviders"; 
 
-// Import your resource components
+// Resources
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
 import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
+import { ConfigEdit, ConfigList } from "./resources/Config"; 
 
-// --- 1. YOU ARE MISSING THIS IMPORT ---
-import { ConfigEdit } from "./resources/Config"; 
-
-// Import icons for the menu
+// Icons
 import GameIcon from '@mui/icons-material/SportsEsports';
 import ClientIcon from '@mui/icons-material/BusinessCenter';
-
-// --- 2. YOU ARE MISSING THIS IMPORT ---
 import SettingsIcon from '@mui/icons-material/Settings'; 
 
 function AdminApp() {
+  
+  // Fix: Reset body background color when Admin Panel loads
+  useEffect(() => {
+    document.body.style.backgroundColor = '#fafafa'; // Standard Material UI light gray
+    document.body.style.backgroundImage = 'none';    // Remove the game gradient
+    document.body.style.color = '#000000';           // Reset text color
+    
+    // Cleanup: When leaving admin, remove these overrides (optional)
+    return () => {
+      document.body.style.backgroundColor = '';
+      document.body.style.backgroundImage = '';
+      document.body.style.color = '';
+    };
+  }, []);
+
   return (
     <Admin
+      // === THE FIX: REMOVED basename="/admin" ===
+      // This switches to HashRouter (e.g. /admin/#/games)
+      // which prevents conflicts with your main site.
       dataProvider={dataProvider}
       authProvider={authProvider}
     >
-      {/* --- 3. YOU ARE MISSING THIS ENTIRE RESOURCE BLOCK --- */}
-      {/* This is the "Site Settings" page */}
       <Resource
         name="config"
         icon={SettingsIcon}
+        list={ConfigList}
         edit={ConfigEdit}
         options={{ label: 'Site Settings' }}
       />
-      {/* ---------------------------------------------------- */}
       
-      {/* Main Games Collection */}
       <Resource
         name="games"
         icon={GameIcon}
@@ -40,7 +52,6 @@ function AdminApp() {
         create={GameCreate}
       />
       
-      {/* Client Projects (Masonry) */}
       <Resource
         name="clientProjects"
         icon={ClientIcon}

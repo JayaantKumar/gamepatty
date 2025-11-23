@@ -8,9 +8,9 @@ import {
   useNotify,
   useRedirect
 } from 'react-admin';
-import { Navigate } from "react-router-dom"; // Import Navigate
+// 1. Import Navigate
+import { Navigate } from "react-router-dom"; 
 
-// Custom toolbar
 const SettingsToolbar = () => (
     <Toolbar>
         <SaveButton alwaysEnable />
@@ -19,12 +19,13 @@ const SettingsToolbar = () => (
 
 const SettingsTitle = () => 'Site Settings';
 
-// === 1. ADD THIS NEW COMPONENT ===
-// This is a fake "List" that just redirects to the Edit page
+// === 2. THIS IS THE MISSING EXPORT ===
+// This component redirects the "List" view directly to the "Edit" view.
+// Without this, AdminApp.jsx crashes because it can't find 'ConfigList'.
 export const ConfigList = () => {
     return <Navigate to="/config/siteSettings" replace />;
 };
-// =================================
+// =====================================
 
 export const ConfigEdit = () => {
   const notify = useNotify();
@@ -46,16 +47,12 @@ export const ConfigEdit = () => {
       <SimpleForm toolbar={<SettingsToolbar />}>
         <NumberInput
           source="newReleaseLimit"
-          label="New Release Game Limit"
-          helperText="How many games to show in 'New Releases' (e.g., 3)"
+          label="New Releases Count"
+          helperText="How many of the most recent games to display (e.g., 3 or 5)."
           min={1}
           max={20}
         />
-        <NumberInput
-          source="newReleaseDays"
-          label="New Release Duration (in days)"
-          helperText="How long a game is considered 'new' (e.g., 90 days)"
-        />
+        {/* We removed the duration input as you requested earlier */}
       </SimpleForm>
     </Edit>
   );

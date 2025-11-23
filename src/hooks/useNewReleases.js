@@ -37,7 +37,8 @@ function useNewReleases() {
         // --- Step 2: Fetch the Most Recent Games ---
         const gamesCollection = collection(db, 'games');
         
-        // LOGIC: Get All Games, Sort by Newest, Take Top X
+        // LOGIC: Get All Games, Sort by Newest Created, Take Top X
+        // We removed the 'where' clause for dates.
         const q = query(
           gamesCollection,
           orderBy('createdAt', 'desc'), // Newest created games first

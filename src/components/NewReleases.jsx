@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // 1. Import Link
-import useNewReleases from '../hooks/useNewReleases'; // This hook now fetches from 'games'
+import { Link } from 'react-router-dom';
+import useNewReleases from '../hooks/useNewReleases';
 
 function NewReleases() {
   const { games, loading, error } = useNewReleases();
@@ -19,20 +19,25 @@ function NewReleases() {
 
       {!loading && !error && games.length > 0 && (
         <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
-          {games.map((game) => (
-            // 2. Changed from <a> to <Link>
-            <Link
-              key={game.id}
-              to={`/specificgame/${game.slug}`} // 3. Link to the internal game page
-              className="block w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer overflow-hidden"
-            >
-              <img
-                src={game.imageUrl}
-                alt={game.title}
-                className="w-full h-auto"
-              />
-            </Link>
-          ))}
+          {games.map((game) => {
+            // === THE FIX IS HERE ===
+            // Check if imageUrl is an object (new upload) or string (old manual entry)
+            const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+
+            return (
+              <Link
+                key={game.id}
+                to={`/specificgame/${game.slug}`}
+                className="block w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer overflow-hidden"
+              >
+                <img
+                  src={imageSrc} // <--- Using the fixed source variable
+                  alt={game.title}
+                  className="w-full h-auto"
+                />
+              </Link>
+            );
+          })}
         </div>
       )}
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import useClientProjectBySlug from '../hooks/useClientProjectBySlug'; // Use the new hook
+import useClientProjectBySlug from '../hooks/useClientProjectBySlug';
 
 function ClientProjectDetailPage() {
   const { slug } = useParams();
-  const { project, loading, error } = useClientProjectBySlug(slug); // Use the new hook
+  const { project, loading, error } = useClientProjectBySlug(slug);
 
   if (loading) {
     return <div className="text-center py-40 text-white">Loading project...</div>;
@@ -15,6 +15,10 @@ function ClientProjectDetailPage() {
   if (!project) {
     return <div className="text-center py-40 text-white">Client project not found.</div>;
   }
+
+  // === THE FIX LOGIC ===
+  // We determine the correct image source here
+  const imageSrc = project.imageUrl?.src || project.imageUrl || "/assets/placeholder.png";
 
   return (
     <div className="bg-gradient-to-b from-black via-[#1a0000] to-[#2b0000] min-h-screen text-white py-16">
@@ -37,13 +41,14 @@ function ClientProjectDetailPage() {
         {/* Project Image */}
         <div className="w-full mb-8">
           <img
-            src={project.imageUrl}
+            // === APPLYING THE FIX HERE ===
+            src={imageSrc}
             alt={project.title}
             className="w-full h-auto object-cover rounded-2xl shadow-xl border border-red-900/50"
           />
         </div>
 
-        {/* Project Description (Optional) */}
+        {/* Project Description */}
         {project.description && (
           <div className="text-gray-300 text-lg leading-relaxed mb-8 prose prose-invert prose-lg max-w-none">
             <p>{project.description}</p>

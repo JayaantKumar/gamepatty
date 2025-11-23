@@ -30,7 +30,7 @@ export const ConfigEdit = () => {
   };
 
   return (
-    // Set 'id' to "siteSettings" to edit that specific document
+    // It edits the 'siteSettings' document in the 'config' collection
     <Edit
       id="siteSettings"
       resource="config"
@@ -42,7 +42,7 @@ export const ConfigEdit = () => {
         <NumberInput
           source="newReleaseLimit"
           label="New Release Game Limit"
-          helperText="How many games to show in 'New Releases' (e.g., 3)"
+          helperText="How many games to show in 'New Releases' (e.Lg., 3)"
         />
         <NumberInput
           source="newReleaseDays"

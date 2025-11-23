@@ -6,11 +6,12 @@ function GameCard({ game, onCardClick }) {
       className="bg-[#111] rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,87,34,0.4)] cursor-pointer"
       onClick={onCardClick}
     >
-      {/* Game Image */}
       <img
-        src={game.imageUrl || "assets/placeholder.png"}
+        // THE FIX: Check if imageUrl is an object with a .src property.
+        // If it is, use .src. If not, treat it as a plain string URL.
+        src={game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png"}
         alt={game.title}
-        className="w-full h-72 object-cover"
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
       />
 
       {/* Card Content */}

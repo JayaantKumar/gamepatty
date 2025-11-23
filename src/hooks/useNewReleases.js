@@ -13,19 +13,17 @@ function useNewReleases() {
         setLoading(true);
         setError(null);
         
-        // 1. Calculate the date 7 days ago
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const timestampSevenDaysAgo = Timestamp.fromDate(sevenDaysAgo);
+        // Get today's date
+        const now = new Date();
+        const timestampNow = Timestamp.fromDate(now);
 
-        // 2. Query the 'games' collection
         const gamesCollection = collection(db, 'games');
+        
+        // LOGIC: Show games where 'newReleaseUntil' is in the FUTURE (greater than Now)
         const q = query(
           gamesCollection,
-          // 3. Where 'createdAt' is newer than 7 days ago
-          where('createdAt', '>=', timestampSevenDaysAgo),
-          // 4. Order by 'createdAt' to show newest first
-          orderBy('createdAt', 'desc')
+          where('newReleaseUntil', '>=', timestampNow),
+          orderBy('newReleaseUntil', 'asc') // Show games expiring soonest first (or swap to 'desc')
         ); 
         
         const querySnapshot = await getDocs(q);
@@ -38,7 +36,7 @@ function useNewReleases() {
         setGames(gamesList);
       } catch (err) {
         console.error("Error fetching new releases: ", err);
-        setError('Failed to fetch new releases.');
+        setError('Failed to fetch new releases. (Check console for Index URL)');
       } finally {
         setLoading(false);
       }

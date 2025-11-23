@@ -27,23 +27,22 @@ function GamesList() {
       id="games"
       className="py-20 px-6 sm:px-10 md:px-20 bg-gradient-to-b from-black via-[#1a0000] to-[#2b0000]"
     >
-      {/* Section Header */}
       <h2 className="text-4xl sm:text-5xl font-black text-center uppercase mb-16 tracking-wide text-white">
         Our <span className="text-red-500">Games</span>
       </h2>
 
-      {/* Loading / Error States */}
       {loading && (
         <p className="text-center text-lg text-gray-400">Loading games...</p>
       )}
       {error && <p className="text-center text-red-500 text-xl">{error}</p>}
 
-      {/* Games List */}
       {!loading &&
         !error &&
         games.map((game, index) => {
           const embedUrl = getEmbedUrl(game.youtubeUrl);
           const reverse = index % 2 !== 0;
+          // === THE FIX ===
+          const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
 
           return (
             <div
@@ -52,7 +51,6 @@ function GamesList() {
                 reverse ? "md:flex-row-reverse" : "md:flex-row"
               } items-center md:items-stretch mb-24 gap-10 md:gap-16`}
             >
-              {/* Left: Video or Image */}
               <div className="md:w-1/2 w-full">
                 {embedUrl ? (
                   <iframe
@@ -65,14 +63,13 @@ function GamesList() {
                   ></iframe>
                 ) : (
                   <img
-                    src={game.imageUrl}
+                    src={imageSrc} // Fixed source here
                     alt={game.title}
                     className="w-full rounded-3xl shadow-2xl border border-red-900 object-cover aspect-video"
                   />
                 )}
               </div>
 
-              {/* Right: Info aligned with video */}
               <div className="md:w-1/2 w-full flex flex-col justify-center text-gray-300 text-[1.05rem] sm:text-[1.15rem] leading-relaxed">
                 <h3 className="text-3xl sm:text-4xl font-extrabold text-white mb-5 tracking-wide text-center md:text-left">
                   {game.title}
@@ -95,9 +92,7 @@ function GamesList() {
                     : game.description}
                 </p>
 
-                {/* Buttons */}
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 justify-center md:justify-start items-center">
-                  {/* View Details */}
                   <Link
                     to={`/specificgame/${game.slug}`}
                     className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30 text-center"
@@ -105,7 +100,6 @@ function GamesList() {
                     View Details
                   </Link>
 
-                  {/* Animated App Store + Play Store Buttons */}
                   <div className="flex gap-3 sm:gap-5 items-center">
                     {game.iosUrl && (
                       <motion.a
@@ -169,20 +163,23 @@ function GamesList() {
           </h3>
 
           <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
-            {games.map((game) => (
-              <img
-                key={game.id}
-                src={game.imageUrl}
-                alt={game.title}
-                className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer"
-                onClick={() => setSelectedGame(game)}
-              />
-            ))}
+            {games.map((game) => {
+               // === THE FIX IS HERE TOO ===
+               const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+               return (
+                <img
+                  key={game.id}
+                  src={imageSrc} // Using the fixed source
+                  alt={game.title}
+                  className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer"
+                  onClick={() => setSelectedGame(game)}
+                />
+               );
+            })}
           </div>
         </div>
       )}
 
-      {/* Modal */}
       {selectedGame && (
         <GameDetailModal
           game={selectedGame}

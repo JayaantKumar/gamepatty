@@ -1,31 +1,35 @@
 import { Admin, Resource } from "react-admin";
-import { dataProvider, authProvider, storageProvider } from "./firebaseProviders";
+import { dataProvider, authProvider } from "./firebaseProviders"; 
 
-// Import all your resource components
+// Import your resource components
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
 import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
-import { ConfigEdit } from "./resources/Config"; // For Site Settings
+
+// --- 1. YOU ARE MISSING THIS IMPORT ---
+import { ConfigEdit } from "./resources/Config"; 
 
 // Import icons for the menu
 import GameIcon from '@mui/icons-material/SportsEsports';
 import ClientIcon from '@mui/icons-material/BusinessCenter';
-import DevIcon from '@mui/icons-material/Build';
-import SettingsIcon from '@mui/icons-material/Settings';
+
+// --- 2. YOU ARE MISSING THIS IMPORT ---
+import SettingsIcon from '@mui/icons-material/Settings'; 
 
 function AdminApp() {
   return (
     <Admin
       dataProvider={dataProvider}
       authProvider={authProvider}
-      storageProvider={storageProvider}
     >
-      {/* Settings Page (no list) */}
+      {/* --- 3. YOU ARE MISSING THIS ENTIRE RESOURCE BLOCK --- */}
+      {/* This is the "Site Settings" page */}
       <Resource
         name="config"
         icon={SettingsIcon}
         edit={ConfigEdit}
         options={{ label: 'Site Settings' }}
       />
+      {/* ---------------------------------------------------- */}
       
       {/* Main Games Collection */}
       <Resource

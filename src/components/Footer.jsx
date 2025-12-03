@@ -7,16 +7,25 @@ import {
   FaYoutube,
   FaXTwitter,
 } from "react-icons/fa6";
-
-const socialLinks = [
-  { icon: <FaDiscord />, href: "https://discord.com/your-server", label: "Discord" },
-  { icon: <FaInstagram />, href: "https://instagram.com/your-profile", label: "Instagram" },
-  { icon: <FaLinkedin />, href: "https://linkedin.com/your-profile", label: "LinkedIn" },
-  { icon: <FaXTwitter />, href: "https://twitter.com/your-profile", label: "X" },
-  { icon: <FaYoutube />, href: "https://youtube.com/your-channel", label: "YouTube" },
-];
+import useSiteSettings from "../hooks/useSiteSettings"; // 1. Import Hook
 
 function Footer() {
+  const { settings } = useSiteSettings(); // 2. Get Settings
+
+  // 3. Helper to generate social links array dynamically
+  const getSocialLinks = () => {
+    if (!settings) return [];
+    const links = [];
+    if (settings.socialDiscord) links.push({ icon: <FaDiscord />, href: settings.socialDiscord, label: "Discord" });
+    if (settings.socialInstagram) links.push({ icon: <FaInstagram />, href: settings.socialInstagram, label: "Instagram" });
+    if (settings.socialLinkedin) links.push({ icon: <FaLinkedin />, href: settings.socialLinkedin, label: "LinkedIn" });
+    if (settings.socialTwitter) links.push({ icon: <FaXTwitter />, href: settings.socialTwitter, label: "X" });
+    if (settings.socialYoutube) links.push({ icon: <FaYoutube />, href: settings.socialYoutube, label: "YouTube" });
+    return links;
+  };
+
+  const socialLinks = getSocialLinks();
+
   return (
     <footer className="bg-gradient-to-t from-[#0a0a0a] via-[#1a0000] to-[#2b0000] text-gray-300 pt-24 pb-12 border-t border-red-900 text-[1.1rem] leading-relaxed">
       <div className="container mx-auto px-6 sm:px-10 md:px-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
@@ -56,35 +65,11 @@ function Footer() {
             Quick Links
           </h4>
           <ul className="space-y-3 sm:space-y-4 text-[1rem] sm:text-[1.1rem]">
-            <li>
-              <Link to="/#games" className="hover:text-[#ff5722] transition-colors">
-                Our Games
-              </Link>
-            </li>
-            {/* === REMOVED "News" === */}
-            <li>
-              {/* === CHANGED "About Us" to a page link === */}
-              <Link to="/about" className="hover:text-[#ff5722] transition-colors">
-                About Us
-              </Link>
-            </li>
-            {/* === REMOVED "Careers" === */}
-            <li>
-              <Link to="/privacy-policy" className="hover:text-[#ff5722] transition-colors">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/cookie-policy" className="hover:text-[#ff5722] transition-colors">
-                Cookie Policy
-              </Link>
-            </li>
-            <li>
-              {/* === FIXED LINK === */}
-              <Link to="/terms-of-service" className="hover:text-[#ff5722] transition-colors">
-                Terms of Service
-              </Link>
-            </li>
+            <li><Link to="/#games" className="hover:text-[#ff5722] transition-colors">Our Games</Link></li>
+            <li><Link to="/about" className="hover:text-[#ff5722] transition-colors">About Us</Link></li>
+            <li><Link to="/privacy-policy" className="hover:text-[#ff5722] transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/cookie-policy" className="hover:text-[#ff5722] transition-colors">Cookie Policy</Link></li>
+            <li><Link to="/terms-of-service" className="hover:text-[#ff5722] transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
 
@@ -93,28 +78,32 @@ function Footer() {
           <h4 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">
             Contact Us
           </h4>
-          <p className="text-[1rem] sm:text-[1.1rem]">123 Gaming Street,</p>
-          <p className="text-[1rem] sm:text-[1.1rem]">Metropolis, 10001</p>
+          {/* 4. Use Dynamic Data */}
+          <p className="text-[1rem] sm:text-[1.1rem]">{settings?.contactAddress1 || "Address Line 1"}</p>
+          <p className="text-[1rem] sm:text-[1.1rem]">{settings?.contactAddress2 || "Address Line 2"}</p>
+          
           <p className="mt-4">
             <a
-              href="mailto:hello@gamepatty.com"
+              href={`mailto:${settings?.contactEmail}`}
               className="hover:text-[#ff5722] transition-colors"
             >
-              hello@gamepatty.com
+              {settings?.contactEmail || "email@example.com"}
             </a>
           </p>
-          <p className="mt-2">
-            <a
-              href="tel:+917880006228"
-              className="hover:text-[#ff5722] transition-colors"
-            >
-              +91 7880006228
-            </a>
-          </p>
+          
+          {settings?.contactPhone && (
+            <p className="mt-2">
+              <a
+                href={`tel:${settings.contactPhone}`}
+                className="hover:text-[#ff5722] transition-colors"
+              >
+                {settings.contactPhone}
+              </a>
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Footer bottom */}
       <div className="text-center border-t border-red-900 pt-8 mt-16 text-gray-500 text-[0.95rem] sm:text-[1rem]">
         <p>
           &copy; {new Date().getFullYear()} <span className="text-white font-semibold">GamePatty</span>. All rights reserved.

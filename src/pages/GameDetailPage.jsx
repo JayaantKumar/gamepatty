@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import useGameBySlug from '../hooks/useGameBySlug';
 import { FaGooglePlay, FaApple, FaPlay } from 'react-icons/fa6';
 
+/**
+ * Convert a YouTube URL into an embeddable URL (autoplay muted + loop)
+ */
 const getEmbedUrl = (url) => {
   if (!url) return "";
   try {
@@ -36,13 +39,37 @@ function GameDetailPage() {
 
   const embedUrl = getEmbedUrl(game.youtubeUrl);
   
-  // === FIX 1: Handle main image ===
-  const mainImageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+  // === FIX 1: Handle main image (support both object and string shapes)
+  // imageUrl can be { src: "url" } or { src: { src: "url", title: "..." } } or a plain string
+  const mainImageSrc =
+    // nested object -> imageUrl.src.src
+    (game.imageUrl && typeof game.imageUrl === 'object' && game.imageUrl.src && typeof game.imageUrl.src === 'object' && game.imageUrl.src.src)
+    // object with direct src string
+    || (game.imageUrl && typeof game.imageUrl === 'object' && typeof game.imageUrl.src === 'string' && game.imageUrl.src)
+    // direct string
+    || (typeof game.imageUrl === 'string' && game.imageUrl)
+    // fallback
+    || "/assets/placeholder.png";
 
-  // === FIX 2: Handle gallery images ===
+  // === FIX 2: Normalize gallery images into an array of string URLs
+  // Handles cases: ["https://..."], [{ src: "https://..." }], [{ src: { src: "https://...", title: "..." } }]
   const imagesToShow =
-    game.galleryImages && game.galleryImages.length > 0
-      ? game.galleryImages.map(img => img?.src || img) // Handle both objects and strings
+    game.galleryImages && Array.isArray(game.galleryImages) && game.galleryImages.length > 0
+      ? game.galleryImages.map(img => {
+          // If img is a string, return it
+          if (!img) return null;
+          if (typeof img === 'string') return img;
+
+          // If img has nested src object { src: { src: 'url' } }
+          if (img.src && typeof img.src === 'object' && typeof img.src.src === 'string') return img.src.src;
+
+          // If img.src is a direct string { src: 'url' }
+          if (img.src && typeof img.src === 'string') return img.src;
+
+          // Fallback: try to find a URL-like field anywhere
+          const urlCandidate = Object.values(img).find(v => typeof v === 'string' && v.startsWith && v.startsWith('http'));
+          return urlCandidate || null;
+        }).filter(Boolean) // remove nulls
       : [mainImageSrc];
 
   const openLightbox = (imgUrl, index) => {

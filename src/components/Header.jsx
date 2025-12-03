@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Link is already imported, which is great
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaDiscord,
   FaInstagram,
@@ -9,28 +9,27 @@ import {
   FaBars,
   FaXmark,
 } from "react-icons/fa6";
-
-const socialLinks = [
-  { icon: <FaDiscord />, href: "https://discord.com/your-server", label: "Discord" },
-  { icon: <FaInstagram />, href: "https://instagram.com/your-profile", label: "Instagram" },
-  { icon: <FaLinkedin />, href: "https://linkedin.com/your-profile", label: "LinkedIn" },
-  { icon: <FaXTwitter />, href: "https://twitter.com/your-profile", label: "X" },
-  { icon: <FaYoutube />, href: "https://youtube.com/your-channel", label: "YouTube" },
-];
-
-// Helper function for smooth scrolling in mobile menu
-const smoothScrollTo = (id, callback) => {
-  callback(); // Close mobile menu
-  setTimeout(() => {
-    const element = document.querySelector(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 100);
-};
+import useSiteSettings from "../hooks/useSiteSettings"; // 1. Import Hook
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { settings } = useSiteSettings(); // 2. Get Settings
+
+  // 3. Helper to generate social links array dynamically (Same as Footer)
+  const getSocialLinks = () => {
+    if (!settings) return [];
+    const links = [];
+    if (settings.socialDiscord) links.push({ icon: <FaDiscord />, href: settings.socialDiscord, label: "Discord" });
+    if (settings.socialInstagram) links.push({ icon: <FaInstagram />, href: settings.socialInstagram, label: "Instagram" });
+    if (settings.socialLinkedin) links.push({ icon: <FaLinkedin />, href: settings.socialLinkedin, label: "LinkedIn" });
+    if (settings.socialTwitter) links.push({ icon: <FaXTwitter />, href: settings.socialTwitter, label: "X" });
+    if (settings.socialYoutube) links.push({ icon: <FaYoutube />, href: settings.socialYoutube, label: "YouTube" });
+    return links;
+  };
+
+  const socialLinks = getSocialLinks();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -38,6 +37,25 @@ function Header() {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleNavigation = (e, sectionId) => {
+    e.preventDefault();
+    closeMobileMenu();
+    if (location.pathname === "/") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
   };
 
   return (
@@ -70,108 +88,32 @@ function Header() {
           </div>
         </div>
 
-        {/* === RIGHT SIDE: Nav Links - Desktop (FIXED) === */}
+        {/* RIGHT SIDE: Nav Links - Desktop */}
         <div className="hidden lg:flex items-center gap-8 text-lg">
-          <Link
-            to="/"
-            className="text-gray-300 hover:text-white transition-colors font-semibold"
-          >
-            Home
-          </Link>
-          {/* Changed from <a> to <Link> and updated 'to' prop */}
-          <Link
-            to="/#new-releases"
-            className="text-gray-300 hover:text-white transition-colors font-semibold"
-          >
-            New Releases
-          </Link>
-          {/* Changed from <a> to <Link> and updated 'to' prop */}
-          <Link
-            to="/#games"
-            className="text-gray-300 hover:text-white transition-colors font-semibold"
-          >
-            Our Games
-          </Link>
-          {/* Changed from <a> to <Link> and updated 'to' prop */}
-          <Link
-            to="/#client-projects"
-            className="text-gray-300 hover:text-white transition-colors font-semibold"
-          >
-            Client's Work
-          </Link>
-          {/* Changed from <a> to <Link> and updated 'to' prop */}
-          <Link
-            to="/#coming-soon"
-            className="text-gray-300 hover:text-white transition-colors font-semibold"
-          >
-            Coming Soon
-          </Link>
-          {/* This one was already correct */}
-          <Link
-            to="/contact"
-            className="bg-[#ff5722] text-white font-bold py-3 px-6 rounded-md hover:bg-[#ff7043] transition-all text-base"
-          >
-            Contact
-          </Link>
+          <Link to="/" className="text-gray-300 hover:text-white transition-colors font-semibold">Home</Link>
+          <a href="#new-releases" onClick={(e) => handleNavigation(e, "new-releases")} className="text-gray-300 hover:text-white transition-colors font-semibold cursor-pointer">New Releases</a>
+          <a href="#games" onClick={(e) => handleNavigation(e, "games")} className="text-gray-300 hover:text-white transition-colors font-semibold cursor-pointer">Our Games</a>
+          <a href="#client-projects" onClick={(e) => handleNavigation(e, "client-projects")} className="text-gray-300 hover:text-white transition-colors font-semibold cursor-pointer">Client's Work</a>
+          <a href="#coming-soon" onClick={(e) => handleNavigation(e, "coming-soon")} className="text-gray-300 hover:text-white transition-colors font-semibold cursor-pointer">Coming Soon</a>
+          <Link to="/contact" className="bg-[#ff5722] text-white font-bold py-3 px-6 rounded-md hover:bg-[#ff7043] transition-all text-base">Contact</Link>
         </div>
-        {/* === END OF FIX === */}
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMobileMenu}
-          className="lg:hidden text-white text-3xl focus:outline-none"
-          aria-label="Toggle mobile menu"
-        >
+        <button onClick={toggleMobileMenu} className="lg:hidden text-white text-3xl focus:outline-none" aria-label="Toggle mobile menu">
           {mobileMenuOpen ? <FaXmark /> : <FaBars />}
         </button>
       </nav>
 
-      {/* Mobile Menu Overlay (This was already correct, no changes) */}
+      {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="lg:hidden absolute left-0 right-0 bg-black/98 z-40 border-t border-gray-800">
           <div className="flex flex-col items-center py-8 space-y-6 px-6">
-            <Link
-              to="/"
-              onClick={closeMobileMenu}
-              className="text-gray-300 hover:text-white transition-colors font-semibold text-xl"
-            >
-              Home
-            </Link>
-            <a
-              href="#new-releases"
-              onClick={() => smoothScrollTo('#new-releases', closeMobileMenu)}
-              className="text-gray-300 hover:text-white transition-colors font-semibold text-xl"
-            >
-              New Releases
-            </a>
-            <a
-              href="#games"
-              onClick={() => smoothScrollTo('#games', closeMobileMenu)}
-              className="text-gray-300 hover:text-white transition-colors font-semibold text-xl"
-            >
-              Our Games
-            </a>
-            <a
-              href="#client-projects"
-              onClick={() => smoothScrollTo('#client-projects', closeMobileMenu)}
-              className="text-gray-300 hover:text-white transition-colors font-semibold text-xl"
-            >
-              Client's Work
-            </a>
-            <a
-              href="#coming-soon"
-              onClick={() => smoothScrollTo('#coming-soon', closeMobileMenu)}
-              className="text-gray-300 hover:text-white transition-colors font-semibold text-xl"
-            >
-              Coming Soon
-            </a>
-            <Link
-              to="/contact"
-              onClick={closeMobileMenu}
-              className="bg-[#ff5722] text-white font-bold py-3 px-6 rounded-md hover:bg-[#ff7043] transition-all text-lg"
-            >
-              Contact
-            </Link>
+            <Link to="/" onClick={closeMobileMenu} className="text-gray-300 hover:text-white transition-colors font-semibold text-xl">Home</Link>
+            <a href="#new-releases" onClick={(e) => handleNavigation(e, "new-releases")} className="text-gray-300 hover:text-white transition-colors font-semibold text-xl cursor-pointer">New Releases</a>
+            <a href="#games" onClick={(e) => handleNavigation(e, "games")} className="text-gray-300 hover:text-white transition-colors font-semibold text-xl cursor-pointer">Our Games</a>
+            <a href="#client-projects" onClick={(e) => handleNavigation(e, "client-projects")} className="text-gray-300 hover:text-white transition-colors font-semibold text-xl cursor-pointer">Client's Work</a>
+            <a href="#coming-soon" onClick={(e) => handleNavigation(e, "coming-soon")} className="text-gray-300 hover:text-white transition-colors font-semibold text-xl cursor-pointer">Coming Soon</a>
+            <Link to="/contact" onClick={closeMobileMenu} className="bg-[#ff5722] text-white font-bold py-3 px-6 rounded-md hover:bg-[#ff7043] transition-all text-lg">Contact</Link>
 
             {/* Mobile Social Icons */}
             <div className="flex items-center gap-5 pt-6 border-t border-gray-700 w-full justify-center">

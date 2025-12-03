@@ -1,6 +1,11 @@
 import React from 'react';
+// 1. Import the hook to get data from Firebase
+import useSiteSettings from '../hooks/useSiteSettings';
 
 function ContactPage() {
+  // 2. Fetch the settings
+  const { settings, loading } = useSiteSettings();
+
   return (
     <div className="py-20 px-6 sm:px-10 md:px-20 bg-gradient-to-b from-black via-[#1a0000] to-[#2b0000] text-white min-h-screen">
       <div className="max-w-4xl mx-auto">
@@ -10,7 +15,7 @@ function ContactPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           
-          {/* Left Side: Contact Form */}
+          {/* Left Side: Contact Form (Static for now) */}
           <form onSubmit={(e) => {
             e.preventDefault();
             alert('Form submitted (this is a demo)');
@@ -56,25 +61,58 @@ function ContactPage() {
             </button>
           </form>
 
-          {/* Right Side: Contact Info */}
+          {/* Right Side: Contact Info (DYNAMIC) */}
           <div className="text-gray-300 text-lg">
             <h3 className="text-3xl font-bold text-white mb-6">Get in Touch</h3>
-            <p className="mb-4">
+            <p className="mb-8">
               Have a question, a project idea, or just want to say hello? Use the form or contact us directly.
             </p>
-            <div className="space-y-4">
+            
+            <div className="space-y-6">
+              {/* Address */}
               <div>
-                <h4 className="font-semibold text-white">Address</h4>
-                <p>123 Gaming Street, Metropolis, 10001</p>
+                <h4 className="font-semibold text-white mb-1">Address</h4>
+                {loading ? (
+                  <p className="text-gray-500 animate-pulse">Loading...</p>
+                ) : (
+                  <>
+                    <p>{settings?.contactAddress1 || "123 Gaming Street"}</p>
+                    <p>{settings?.contactAddress2 || "Metropolis, 10001"}</p>
+                  </>
+                )}
               </div>
+
+              {/* Email */}
               <div>
-                <h4 className="font-semibold text-white">Email</h4>
-                <p>
-                  <a href="mailto:hello@studio.com" className="text-red-400 hover:text-red-300">
-                    hello@studio.com
-                  </a>
-                </p>
+                <h4 className="font-semibold text-white mb-1">Email</h4>
+                {loading ? (
+                  <p className="text-gray-500 animate-pulse">Loading...</p>
+                ) : (
+                  <p>
+                    <a 
+                      href={`mailto:${settings?.contactEmail}`} 
+                      className="text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      {settings?.contactEmail || "hello@gamepatty.com"}
+                    </a>
+                  </p>
+                )}
               </div>
+
+              {/* Phone (Only shows if added in Admin) */}
+              {!loading && settings?.contactPhone && (
+                <div>
+                  <h4 className="font-semibold text-white mb-1">Phone</h4>
+                  <p>
+                    <a 
+                      href={`tel:${settings.contactPhone}`} 
+                      className="text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      {settings.contactPhone}
+                    </a>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

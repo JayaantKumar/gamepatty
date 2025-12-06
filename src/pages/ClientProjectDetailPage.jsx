@@ -1,6 +1,10 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import useClientProjectBySlug from '../hooks/useClientProjectBySlug';
+
+// 1. Import FaSteam
+import { FaApple, FaGooglePlay, FaSteam } from 'react-icons/fa6'; 
 
 function ClientProjectDetailPage() {
   const { slug } = useParams();
@@ -56,18 +60,40 @@ function ClientProjectDetailPage() {
         )}
 
         {/* Link to Client's Site/Store */}
-        {project.clientUrl && (
-           <div className="text-center mt-12">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mt-12">
+            
+            {/* Existing "View Project Live" Button */}
+            {project.clientUrl && (
              <a
               href={project.clientUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-red-600 hover:bg-red-500 text-white font-bold px-10 py-4 text-xl rounded-xl transition-all shadow-lg hover:shadow-red-600/30"
+              className="inline-block bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-red-600/30"
             >
               View Project Live
             </a>
-           </div>
-        )}
+            )}
+
+            {/* === ADD STEAM BUTTON === */}
+            {project.steamUrl && (
+                <motion.a
+                href={project.steamUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(23, 26, 33, 0.5)" }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
+                >
+                <FaSteam size={28} className="text-white" />
+                <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-gray-400">Download on</span>
+                    <span className="text-sm font-semibold text-white">Steam</span>
+                </div>
+                </motion.a>
+            )}
+            {/* ======================== */}
+
+        </div>
       </div>
     </div>
   );

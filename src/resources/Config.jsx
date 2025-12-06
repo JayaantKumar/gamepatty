@@ -3,7 +3,7 @@ import {
   Edit,
   SimpleForm,
   NumberInput,
-  TextInput, // 1. Import TextInput
+  TextInput,
   Toolbar,
   SaveButton,
   useNotify,
@@ -29,6 +29,7 @@ export const ConfigEdit = () => {
 
   const onSuccess = () => {
       notify('Settings saved successfully!');
+      // Do NOT redirect. Stay on the page so you can see the changes.
       redirect(false); 
   };
 
@@ -39,6 +40,9 @@ export const ConfigEdit = () => {
       title={<SettingsTitle />}
       mutationOptions={{ onSuccess }}
       redirect={false}
+      // === ADD THIS LINE ===
+      mutationMode="pessimistic"
+      // =====================
     >
       <SimpleForm toolbar={<SettingsToolbar />}>
         {/* Game Logic Section */}

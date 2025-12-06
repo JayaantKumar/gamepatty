@@ -69,6 +69,10 @@ const GameForm = () => (
     <TextInput source="androidUrl" label="Android Play Store URL" fullWidth />
     <TextInput source="iosUrl" label="Apple App Store URL" fullWidth />
 
+    {/* === ADD THIS LINE === */}
+    <TextInput source="steamUrl" label="Steam Store URL" fullWidth />
+    {/* ===================== */}
+
     <ArrayInput source="tags">
       <SimpleFormIterator>
         <TextInput source="" label="Tag" />
@@ -162,6 +166,10 @@ export const GameCreate = () => (
       <TextInput source="liveDemoUrl" label="Live Demo URL" fullWidth />
       <TextInput source="androidUrl" label="Android Play Store URL" fullWidth />
       <TextInput source="iosUrl" label="Apple App Store URL" fullWidth />
+
+      {/* === ADD THIS LINE === */}
+      <TextInput source="steamUrl" label="Steam Store URL" fullWidth />
+      {/* ===================== */}
 
       <ArrayInput source="tags">
         <SimpleFormIterator>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion'; 
 import useGameBySlug from '../hooks/useGameBySlug';
-import { FaGooglePlay, FaApple, FaPlay } from 'react-icons/fa6';
+import { FaGooglePlay, FaApple, FaPlay, FaSteam } from 'react-icons/fa6';
 
 /**
  * Convert a YouTube URL into an embeddable URL (autoplay muted + loop)
@@ -188,6 +188,25 @@ function GameDetailPage() {
                   </div>
                 </motion.a>
               )}
+
+              {/* === NEW STEAM BUTTON === */}
+              {game.steamUrl && (
+                <motion.a
+                  href={game.steamUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(23,26,33,0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl"
+                >
+                  <FaSteam size={28} className="text-white" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-gray-400">Download on</span>
+                    <span className="text-sm font-semibold text-white">Steam</span>
+                  </div>
+                </motion.a>
+              )}
+              
             </div>
 
             <div>

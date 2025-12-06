@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // 1. Import motion and store icons
 import { motion } from "framer-motion";
-import { FaApple, FaGooglePlay } from "react-icons/fa";
+import { FaApple, FaGooglePlay, FaSteam } from "react-icons/fa";  // FaSteam added
 
 const getEmbedUrl = (url) => {
   if (!url) return "";
@@ -114,8 +114,8 @@ function GameDetailModal({ game, onClose }) {
             </p>
 
             {/* === 2. UPDATED BUTTON STYLES === */}
-            {/* Using motion.a and styles from GamesList.jsx */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mb-10">
+
               {game.iosUrl && (
                 <motion.a
                   href={game.iosUrl}
@@ -139,6 +139,7 @@ function GameDetailModal({ game, onClose }) {
                   </div>
                 </motion.a>
               )}
+
               {game.androidUrl && (
                 <motion.a
                   href={game.androidUrl}
@@ -162,6 +163,31 @@ function GameDetailModal({ game, onClose }) {
                   </div>
                 </motion.a>
               )}
+
+              {/* === ADDED STEAM BUTTON (NOTHING ELSE CHANGED) === */}
+              {game.steamUrl && (
+                <motion.a
+                  href={game.steamUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 15px rgba(23,26,33,0.5)",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
+                >
+                  <FaSteam size={28} className="text-white" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-gray-400">Download on</span>
+                    <span className="text-sm font-semibold text-white">
+                      Steam
+                    </span>
+                  </div>
+                </motion.a>
+              )}
+              {/* =============================== */}
+
             </div>
             {/* === END OF BUTTON UPDATE === */}
 
@@ -170,22 +196,17 @@ function GameDetailModal({ game, onClose }) {
               <h3 className="text-3xl font-bold mb-5 text-white">Gallery</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {imagesToShow.map((imgUrl, index) => (
-                  // Removed fixed height and object-cover from the image below
                   <div
                     key={index}
                     className="overflow-hidden rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,87,34,0.4)] cursor-pointer relative group"
                     onClick={() => openLightbox(imgUrl, index)}
                   >
-                    {/* === 3. UPDATED IMAGE STYLES === */}
                     <img
                       src={imgUrl}
                       alt={`${game.title} gallery image ${index + 1}`}
-                      // Removed h-60 and object-cover
-                      className="w-full h-auto" 
+                      className="w-full h-auto"
                     />
-                    {/* === END OF IMAGE UPDATE === */}
-                    
-                    {/* Magnifying glass overlay */}
+
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                       <svg
                         className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -204,8 +225,11 @@ function GameDetailModal({ game, onClose }) {
                   </div>
                 ))}
               </div>
+
               {imagesToShow.length === 0 && (
-                <p className="text-gray-500 mt-4">No gallery images available.</p>
+                <p className="text-gray-500 mt-4">
+                  No gallery images available.
+                </p>
               )}
             </div>
           </div>
@@ -218,15 +242,13 @@ function GameDetailModal({ game, onClose }) {
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={closeLightbox}
         >
-          {/* Close button for lightbox */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-[70]" // Ensure higher z-index
+            className="absolute top-4 right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-[70]"
           >
             &times;
           </button>
 
-          {/* Previous image button */}
           {imagesToShow.length > 1 && (
             <button
               onClick={showPreviousImage}
@@ -236,7 +258,6 @@ function GameDetailModal({ game, onClose }) {
             </button>
           )}
 
-          {/* Next image button */}
           {imagesToShow.length > 1 && (
             <button
               onClick={showNextImage}
@@ -246,17 +267,15 @@ function GameDetailModal({ game, onClose }) {
             </button>
           )}
 
-          {/* Image counter */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-lg bg-black/50 px-4 py-2 rounded-full z-[70]">
             {lightboxIndex + 1} / {imagesToShow.length}
           </div>
 
-          {/* The full-size image */}
           <img
             src={lightboxImage}
             alt="Full size"
             className="max-w-[90vw] max-h-[90vh] object-contain"
-            onClick={(e) => e.stopPropagation()} // Stop click from closing lightbox
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}

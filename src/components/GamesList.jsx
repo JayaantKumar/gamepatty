@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaApple, FaGooglePlay } from "react-icons/fa";
+// 1. Import FaSteam
+import { FaApple, FaGooglePlay, FaSteam } from "react-icons/fa6";
 import useGames from "../hooks/useGames";
 import GameDetailModal from "./GameDetailModal";
 
@@ -41,7 +42,6 @@ function GamesList() {
         games.map((game, index) => {
           const embedUrl = getEmbedUrl(game.youtubeUrl);
           const reverse = index % 2 !== 0;
-          // === THE FIX ===
           const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
 
           return (
@@ -63,7 +63,7 @@ function GamesList() {
                   ></iframe>
                 ) : (
                   <img
-                    src={imageSrc} // Fixed source here
+                    src={imageSrc}
                     alt={game.title}
                     className="w-full rounded-3xl shadow-2xl border border-red-900 object-cover aspect-video"
                   />
@@ -101,6 +101,33 @@ function GamesList() {
                   </Link>
 
                   <div className="flex gap-3 sm:gap-5 items-center">
+                    
+                    {/* === ADDED STEAM BUTTON === */}
+                    {game.steamUrl && (
+                      <motion.a
+                        href={game.steamUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0px 0px 15px rgba(23, 26, 33, 0.5)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
+                      >
+                        <FaSteam size={28} className="text-white" />
+                        <div className="flex flex-col text-left leading-tight">
+                          <span className="text-xs text-gray-400">
+                            Download on
+                          </span>
+                          <span className="text-sm font-semibold text-white">
+                            Steam
+                          </span>
+                        </div>
+                      </motion.a>
+                    )}
+                    {/* ========================== */}
+
                     {game.iosUrl && (
                       <motion.a
                         href={game.iosUrl}
@@ -164,12 +191,11 @@ function GamesList() {
 
           <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
             {games.map((game) => {
-               // === THE FIX IS HERE TOO ===
                const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
                return (
                 <img
                   key={game.id}
-                  src={imageSrc} // Using the fixed source
+                  src={imageSrc}
                   alt={game.title}
                   className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer"
                   onClick={() => setSelectedGame(game)}

@@ -1,66 +1,74 @@
 import * as React from "react";
-import { useEffect } from "react";
-import { useWatch, useFormContext } from "react-hook-form";
-
+import { useWatch, useFormContext } from 'react-hook-form';
+import { useEffect } from 'react';
 import {
-  List, Datagrid, TextField, UrlField, DateField,
+  List, Datagrid, TextField, DateField,
   Edit, Create, SimpleForm, TextInput, DateInput,
   ArrayInput, SimpleFormIterator, ImageInput, ImageField,
-  CloneButton // 1. Import CloneButton
+  CloneButton
 } from 'react-admin';
 
-// Helper to get a date 3 months in the future
-const getDefaultExpiryDate = () => {
-  const date = new Date();
-  date.setMonth(date.getMonth() + 3);
-  return date;
+const SlugUpdater = () => {
+    const { setValue } = useFormContext();
+    const title = useWatch({ name: 'title' });
+
+    useEffect(() => {
+        if (title) {
+            const slug = title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-');
+            
+            setValue('slug', slug);
+        }
+    }, [title, setValue]);
+
+    return null;
 };
 
-// -----------------------------
-// Game list
-// -----------------------------
 export const GameList = () => (
   <List sort={{ field: 'createdAt', order: 'DESC' }}>
-    {/* We keep rowClick="edit", but the CloneButton will 
-       override the click when specifically clicked.
-    */}
     <Datagrid rowClick="edit">
       <ImageField source="imageUrl.src" title="title" label="Cover" />
       <TextField source="title" />
       <TextField source="slug" />
       <DateField source="newReleaseUntil" label="New Release Until" />
       <DateField source="createdAt" label="Created On" />
-      
-      {/* 2. Add the Duplicate Button here */}
       <CloneButton /> 
     </Datagrid>
   </List>
 );
 
-// -----------------------------
-// Shared Game form (used by Edit/Create if you prefer)
-// -----------------------------
 const GameForm = () => (
   <SimpleForm>
     <TextInput source="title" fullWidth />
     <TextInput 
       source="slug" 
       fullWidth 
-      helperText="IMPORTANT: You must change the slug when duplicating, or the URLs will conflict!" 
+      helperText="IMPORTANT: Change the slug if duplicating!" 
     />
     <TextInput source="description" multiline fullWidth />
     
     <div style={{ display: 'flex', gap: '20px' }}>
-      <DateInput source="releasedAt" label="Original Release Date" />
-      <DateInput 
-        source="newReleaseUntil" 
-        label="Show in 'New Releases' Until" 
-        helperText="The game will stay in the 'New Releases' section until this date."
-        parse={(date) => new Date(date)}
-      />
+        <DateInput source="releasedAt" label="Original Release Date" />
+        <DateInput 
+            source="newReleaseUntil" 
+            label="Show in 'New Releases' Until" 
+            parse={(date) => new Date(date)}
+        />
     </div>
     
-    <ImageInput source="imageUrl" label="Main Cover Image (Upload)">
+    {/* === NEW BANNER IMAGE FIELD === */}
+    <ImageInput source="bannerUrl" label="Top Banner Image (Optional)">
+      <ImageField source="src" title="title" />
+    </ImageInput>
+    <p style={{ margin: '-10px 0 20px', fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+      Recommended aspect ratio: 21:9 (e.g., 2560x1080) for a cinematic look.
+    </p>
+    {/* ============================== */}
+
+    <ImageInput source="imageUrl" label="Main Cover Image (Box Art)">
       <ImageField source="src" title="title" />
     </ImageInput>
     
@@ -68,14 +76,15 @@ const GameForm = () => (
     <TextInput source="liveDemoUrl" label="Live Demo URL" fullWidth />
     <TextInput source="androidUrl" label="Android Play Store URL" fullWidth />
     <TextInput source="iosUrl" label="Apple App Store URL" fullWidth />
-
-    {/* === ADD THIS LINE === */}
     <TextInput source="steamUrl" label="Steam Store URL" fullWidth />
-    {/* ===================== */}
 
     <ArrayInput source="tags">
       <SimpleFormIterator>
-        <TextInput source="" label="Tag" />
+        <TextInput 
+          source="" 
+          label="Tag" 
+          parse={(value) => value ? value.toLowerCase() : ""}
+        />
       </SimpleFormIterator>
     </ArrayInput>
     
@@ -89,63 +98,29 @@ const GameForm = () => (
   </SimpleForm>
 );
 
-// -----------------------------
-// Edit
-// -----------------------------
 export const GameEdit = () => (
   <Edit>
     <GameForm />
   </Edit>
 );
 
-// -----------------------------
-// Slug auto-updater component
-// -----------------------------
-const SlugUpdater = () => {
-  const { setValue } = useFormContext();
-  const title = useWatch({ name: 'title' });
-
-  useEffect(() => {
-    if (!title) return;
-
-    const slug = title
-      .toString()
-      .toLowerCase()
-      .normalize('NFKD') // normalize accents
-      .replace(/[\u0300-\u036f]/g, '') // remove accent marks
-      .replace(/[^a-z0-9\s-]/g, '') // remove invalid chars
-      .trim()
-      .replace(/\s+/g, '-') // spaces -> hyphens
-      .replace(/-+/g, '-'); // collapse multiple hyphens
-
-    setValue('slug', slug);
-  }, [title, setValue]);
-
-  return null;
-};
-
-// -----------------------------
-// Create (with SlugUpdater)
-// -----------------------------
 export const GameCreate = () => (
   <Create>
     <SimpleForm defaultValues={{ 
       createdAt: new Date(),
-      newReleaseUntil: getDefaultExpiryDate(),
       androidUrl: null,
       iosUrl: null,
-      liveDemoUrl: null
+      liveDemoUrl: null,
+      steamUrl: null,
     }}>
-      {/* Slug auto-generation — watches title and writes slug */}
       <SlugUpdater />
 
       <TextInput source="title" fullWidth />
       <TextInput 
         source="slug" 
         fullWidth 
-        helperText="Auto-generated from title. You can edit this manually if needed."
+        helperText="Auto-generated from title."
       />
-      
       <TextInput source="description" multiline fullWidth />
       
       <div style={{ display: 'flex', gap: '20px' }}>
@@ -153,12 +128,20 @@ export const GameCreate = () => (
         <DateInput 
             source="newReleaseUntil" 
             label="Show in 'New Releases' Until" 
-            helperText="Defaults to 3 months, but you can change it."
             parse={(date) => new Date(date)}
         />
       </div>
       
-      <ImageInput source="imageUrl" label="Main Cover Image (Upload)">
+      {/* === NEW BANNER IMAGE FIELD === */}
+      <ImageInput source="bannerUrl" label="Top Banner Image (Optional)">
+        <ImageField source="src" title="title" />
+      </ImageInput>
+      <p style={{ margin: '-10px 0 20px', fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+        Recommended aspect ratio: 21:9 (e.g., 2560x1080) for a cinematic look.
+      </p>
+      {/* ============================== */}
+
+      <ImageInput source="imageUrl" label="Main Cover Image (Box Art)">
         <ImageField source="src" title="title" />
       </ImageInput>
       
@@ -166,14 +149,15 @@ export const GameCreate = () => (
       <TextInput source="liveDemoUrl" label="Live Demo URL" fullWidth />
       <TextInput source="androidUrl" label="Android Play Store URL" fullWidth />
       <TextInput source="iosUrl" label="Apple App Store URL" fullWidth />
-
-      {/* === ADD THIS LINE === */}
       <TextInput source="steamUrl" label="Steam Store URL" fullWidth />
-      {/* ===================== */}
 
       <ArrayInput source="tags">
         <SimpleFormIterator>
-          <TextInput source="" label="Tag" />
+          <TextInput 
+            source="" 
+            label="Tag" 
+            parse={(value) => value ? value.toLowerCase() : ""}
+          />
         </SimpleFormIterator>
       </ArrayInput>
       

@@ -3,8 +3,6 @@ import { db } from '../firebase';
 import { collection, getDocs, query } from 'firebase/firestore';
 
 function useAllPortfolioItems() {
-  // === THIS IS THE FIX ===
-  // Make sure 'projects' is initialized as an empty array: useState([])
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,17 +21,23 @@ function useAllPortfolioItems() {
           getDocs(clientProjectsQuery),
         ]);
 
+        // Map 'games' data
         const gamesList = gamesSnapshot.docs.map(doc => ({
           id: doc.id,
           title: doc.data().title,
           imageUrl: doc.data().imageUrl,
+          youtubeUrl: doc.data().youtubeUrl, // <--- ADDED THIS
           linkUrl: `/specificgame/${doc.data().slug}`,
         }));
 
+        // Map 'clientProjects' data
         const clientProjectsList = clientProjectsSnapshot.docs.map(doc => ({
           id: doc.id,
           title: doc.data().title,
           imageUrl: doc.data().imageUrl,
+          // Client projects usually don't have youtubeUrl in your setup, 
+          // but if you added it, this will grab it.
+          youtubeUrl: doc.data().youtubeUrl, // <--- ADDED THIS
           linkUrl: `/clientproject/${doc.data().slug}`,
         }));
 

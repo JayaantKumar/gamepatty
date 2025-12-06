@@ -2,6 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import useAllPortfolioItems from '../hooks/useAllPortfolioItems';
 
+// Helper to extract YouTube ID
+const getEmbedUrl = (url) => {
+  if (!url) return "";
+  try {
+    const videoId = new URL(url).searchParams.get("v");
+    if (videoId) {
+      // autoplay=0 to prevent chaos, controls=1 to allow user to play
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}&controls=1`;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+};
+
 function PortfolioPage() {
   const { projects, loading, error } = useAllPortfolioItems();
 
@@ -30,32 +45,66 @@ function PortfolioPage() {
       {!loading && !error && projects && projects.length > 0 && (
         <div className="max-w-7xl mx-auto columns-1 md:columns-2 lg:columns-3 gap-6 md:gap-8 space-y-6 md:space-y-8">
           {projects.map((project) => {
-            // === THE FIX ===
-            // Check if imageUrl is an object (new upload) or string (old upload)
+            // 1. Get Image Source
             const imageSrc = project.imageUrl?.src || project.imageUrl || "/assets/placeholder.png";
+            // 2. Get Video Source
+            const embedUrl = getEmbedUrl(project.youtubeUrl);
 
-            return (
-              <Link
-                key={project.id}
-                to={project.linkUrl} 
-                title={project.title}
-                className="group block break-inside-avoid mb-6 md:mb-8 rounded-3xl overflow-hidden border-2 border-red-900/50 shadow-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-red-600/40 hover:border-red-600 bg-black/40"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={imageSrc} // Use the fixed source
-                    alt={project.title}
-                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 via-black/60 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-                    <h3 className="text-xl md:text-2xl font-black text-white text-center tracking-wide drop-shadow-lg">
-                      {project.title}
-                    </h3>
+            // Common container styles
+            const cardClasses = "group block break-inside-avoid mb-6 md:mb-8 rounded-3xl overflow-hidden border-2 border-red-900/50 shadow-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-red-600/40 hover:border-red-600 bg-black/40 relative";
+
+            if (embedUrl) {
+              /* === RENDER VIDEO CARD === */
+              return (
+                <div key={project.id} className={cardClasses}>
+                  {/* Video Player */}
+                  <div className="w-full aspect-video">
+                    <iframe
+                      src={embedUrl}
+                      title={project.title}
+                      className="w-full h-full object-cover"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
                   </div>
+
+                  {/* Title Overlay (Clickable Link) */}
+                  <Link 
+                    to={project.linkUrl}
+                    className="absolute bottom-0 left-0 right-0 p-4 md:p-5 bg-gradient-to-t from-black via-black/80 to-transparent hover:bg-black/90 transition-colors"
+                  >
+                    <h3 className="text-xl md:text-2xl font-black text-white text-center tracking-wide drop-shadow-lg group-hover:text-red-500 transition-colors">
+                      {project.title} <span className="text-sm font-normal text-gray-400 block mt-1">(View Details)</span>
+                    </h3>
+                  </Link>
                 </div>
-              </Link>
-            );
+              );
+            } else {
+              /* === RENDER IMAGE CARD (Standard) === */
+              return (
+                <Link
+                  key={project.id}
+                  to={project.linkUrl} 
+                  title={project.title}
+                  className={cardClasses}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={imageSrc}
+                      alt={project.title}
+                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 via-black/60 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                      <h3 className="text-xl md:text-2xl font-black text-white text-center tracking-wide drop-shadow-lg">
+                        {project.title}
+                      </h3>
+                    </div>
+                  </div>
+                </Link>
+              );
+            }
           })}
         </div>
       )}

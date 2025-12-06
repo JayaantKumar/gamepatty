@@ -68,9 +68,12 @@ function ClientProjectDetailPage() {
                     
                     <div className="w-20 h-2 bg-red-600 rounded-full mb-8"></div>
 
-                    <p className="text-xl text-gray-300 leading-relaxed mb-10">
-                        {project.description}
-                    </p>
+                    {/* Description: prefer longDescription, preserve newlines */}
+                    {(project.longDescription || project.description) && (
+                      <div className="text-xl text-gray-300 leading-relaxed mb-10 whitespace-pre-wrap font-light">
+                        {project.longDescription || project.description}
+                      </div>
+                    )}
 
                     {/* Links */}
                     <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mt-8">

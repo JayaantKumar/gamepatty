@@ -17,12 +17,10 @@ function GameDetailPage() {
 
   const videoId = game.youtubeUrl ? new URL(game.youtubeUrl).searchParams.get("v") : null;
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}` : null;
-  // Handle old string images vs new object images
+
   const mainCoverSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
 
-  // === NEW: Handle Banner Image ===
   const bannerSrc = game.bannerUrl?.src || game.bannerUrl || null;
-  // ================================
 
   const openLightbox = (index) => {
     setCurrentImageIndex(index);
@@ -44,26 +42,21 @@ function GameDetailPage() {
   return (
     <div className="bg-[#0a0a0a] text-gray-100 min-h-screen pb-20">
         
-      {/* === NEW: FULL WIDTH BANNER === */}
       {bannerSrc && (
         <div className="w-full h-[300px] md:h-[450px] relative mb-8">
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent z-10"></div>
-          {/* replaced with SmartImage */}
           <SmartImage src={bannerSrc} alt={`${game.title} Banner`} className="w-full h-full" isBanner={true} />
         </div>
       )}
-      {/* ============================== */}
 
       <div className="container mx-auto px-4 max-w-6xl">
-        {/* Back Button */}
+        
         <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
             <FaChevronLeft className="group-hover:-translate-x-1 transition-transform"/> Back to Games
         </Link>
 
-        {/* Main Content Layout */}
         <div className="flex flex-col lg:flex-row gap-10 mb-16">
             
-            {/* Left: Media (Video or Main Cover) */}
             <div className="lg:w-3/5 flex-shrink-0">
                 <div className="rounded-3xl overflow-hidden shadow-2xl border border-red-900/50 aspect-video relative bg-black">
                     {embedUrl ? (
@@ -76,17 +69,14 @@ function GameDetailPage() {
                             className="w-full h-full"
                         ></iframe>
                     ) : (
-                        // replaced with SmartImage
                         <SmartImage src={mainCoverSrc} alt={game.title} className="w-full h-full" />
                     )}
                 </div>
             </div>
 
-            {/* Right: Info & Buttons */}
             <div className="lg:w-2/5 flex flex-col justify-center">
                 <h1 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-wide uppercase drop-shadow-lg">{game.title}</h1>
                 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-3 mb-8">
                     {game.tags?.map((tag, index) => (
                         <span key={index} className="px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-red-100 bg-red-900/80 rounded-full border border-red-500/30">
@@ -95,10 +85,12 @@ function GameDetailPage() {
                     ))}
                 </div>
 
-                {/* Description */}
-                <p className="text-lg text-gray-300 leading-relaxed mb-10">{game.description}</p>
+                {/* 🔥 UPDATED DESCRIPTION SECTION */}
+                <div className="text-lg text-gray-300 leading-relaxed mb-10 whitespace-pre-wrap font-light">
+                  {game.longDescription || game.description}
+                </div>
+                {/* -------------------------------- */}
 
-                {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center">
                     
                     {game.liveDemoUrl && (
@@ -168,13 +160,11 @@ function GameDetailPage() {
             </div>
         </div>
 
-        {/* Gallery Section */}
         {game.galleryImages && game.galleryImages.length > 0 && (
             <div className="mb-16">
                 <h2 className="text-3xl font-bold text-white mb-8 tracking-wide text-center"><span className="text-red-500">Gameplay</span> Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {game.galleryImages.map((imgObj, index) => {
-                         // Fix for accessing nested src in gallery
                          const imgSrc = imgObj?.src?.src || imgObj?.src || "/assets/placeholder.png";
                          return (
                         <motion.div 
@@ -193,7 +183,6 @@ function GameDetailPage() {
         )}
       </div>
 
-      {/* Lightbox Modal */}
       <AnimatePresence>
         {lightboxOpen && (
             <motion.div 
@@ -218,12 +207,13 @@ function GameDetailPage() {
                         </button>
                         </>
                     )}
-                    {/* Fix for lightbox image src */}
+
                     <img 
                         src={game.galleryImages[currentImageIndex]?.src?.src || game.galleryImages[currentImageIndex]?.src} 
                         alt={`Gallery Image ${currentImageIndex + 1}`} 
                         className="w-full h-full object-contain rounded-lg shadow-2xl border border-gray-800"
                     />
+
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-gray-400 text-sm bg-black/60 px-3 py-1 rounded-full">
                         {currentImageIndex + 1} / {game.galleryImages.length}
                     </div>

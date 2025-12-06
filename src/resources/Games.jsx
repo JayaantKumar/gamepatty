@@ -48,8 +48,27 @@ const GameForm = () => (
       fullWidth 
       helperText="IMPORTANT: Change the slug if duplicating!" 
     />
-    <TextInput source="description" multiline fullWidth />
-    
+
+    {/* ================= SHORT SUMMARY ================= */}
+    <TextInput 
+      source="description"
+      label="Short Summary (For Home Page Cards)"
+      fullWidth
+      multiline={false}
+      helperText="This appears on the cards on the homepage. Keep it short."
+    />
+
+    {/* ================= LONG DESCRIPTION ================= */}
+    <TextInput 
+      source="longDescription"
+      label="Full Detailed Description (Detail Page)"
+      fullWidth
+      multiline
+      rows={10}
+      helperText="This appears on the Game Detail Page. New lines are preserved."
+    />
+    {/* =================================================== */}
+
     <div style={{ display: 'flex', gap: '20px' }}>
         <DateInput source="releasedAt" label="Original Release Date" />
         <DateInput 
@@ -121,7 +140,26 @@ export const GameCreate = () => (
         fullWidth 
         helperText="Auto-generated from title."
       />
-      <TextInput source="description" multiline fullWidth />
+
+      {/* ================= SHORT SUMMARY ================= */}
+      <TextInput 
+        source="description"
+        label="Short Summary (For Home Page Cards)"
+        fullWidth
+        multiline={false}
+        helperText="This appears on the cards on the homepage. Keep it short."
+      />
+
+      {/* ================= LONG DESCRIPTION ================= */}
+      <TextInput 
+        source="longDescription"
+        label="Full Detailed Description (Detail Page)"
+        fullWidth
+        multiline
+        rows={10}
+        helperText="This appears on the Game Detail Page. New lines are preserved."
+      />
+      {/* =================================================== */}
       
       <div style={{ display: 'flex', gap: '20px' }}>
         <DateInput source="releasedAt" label="Release Date" />
@@ -156,7 +194,7 @@ export const GameCreate = () => (
           <TextInput 
             source="" 
             label="Tag" 
-            parse={(value) => value ? value.toLowerCase() : ""}
+            parse={(value) => value ? value.toLowerCase() : ""} 
           />
         </SimpleFormIterator>
       </ArrayInput>

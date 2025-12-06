@@ -47,8 +47,26 @@ const ClientProjectForm = () => (
       fullWidth 
       helperText="IMPORTANT: Change the slug when duplicating!" 
     />
-    <TextInput source="description" multiline fullWidth />
-    
+
+    {/* ================= SHORT SUMMARY ================= */}
+    <TextInput 
+      source="description"
+      label="Short Summary (For Cards)"
+      fullWidth
+      multiline={false}
+    />
+
+    {/* ================= LONG DESCRIPTION ================= */}
+    <TextInput 
+      source="longDescription"
+      label="Full Project Details"
+      fullWidth
+      multiline
+      rows={10}
+      helperText="Press ENTER twice to create paragraphs."
+    />
+    {/* =================================================== */}
+
     <DateInput source="releasedAt" label="Release Date" />
     
     <SelectInput 
@@ -103,7 +121,25 @@ export const ClientProjectCreate = () => (
         fullWidth 
         helperText="Auto-generated from title." 
       />
-      <TextInput source="description" multiline fullWidth />
+
+      {/* ================= SHORT SUMMARY ================= */}
+      <TextInput 
+        source="description"
+        label="Short Summary (For Cards)"
+        fullWidth
+        multiline={false}
+      />
+
+      {/* ================= LONG DESCRIPTION ================= */}
+      <TextInput 
+        source="longDescription"
+        label="Full Project Details"
+        fullWidth
+        multiline
+        rows={10}
+        helperText="Press ENTER twice to create paragraphs."
+      />
+      {/* =================================================== */}
       
       <DateInput source="releasedAt" label="Release Date" />
 

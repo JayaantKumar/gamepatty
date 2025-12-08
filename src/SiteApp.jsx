@@ -8,11 +8,13 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutUsPage from './pages/AboutUsPage';
-import ClientProjectDetailPage from './pages/ClientProjectDetailPage'; 
+import ClientProjectDetailPage from './pages/ClientProjectDetailPage';
 
 // 1. Import the new portfolio page
 import PortfolioPage from './pages/PortfolioPage';
-// 2. Remove the old 'Underdeveloped' page imports
+
+// 2. Import the new GhostProject detail page
+import GhostProjectDetailPage from "./pages/GhostProjectDetailPage";
 
 function App() {
   return (
@@ -20,21 +22,25 @@ function App() {
       <Header />
       <main className="flex-grow">
         <Routes>
+
           {/* Main Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/specificgame/:slug" element={<GameDetailPage />} />
-          <Route path="/clientproject/:slug" element={<ClientProjectDetailPage />} /> 
-          
+          <Route path="/clientproject/:slug" element={<ClientProjectDetailPage />} />
+
+          {/* 🔥 NEW Route for Ghost Projects */}
+          <Route path="/ghostproject/:slug" element={<GhostProjectDetailPage />} />
+
           {/* Static Page Routes */}
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           <Route path="/about" element={<AboutUsPage />} />
-          
-          {/* 3. Add the new "hidden" route */}
+
+          {/* Portfolio Route */}
           <Route path="/portfolio" element={<PortfolioPage />} />
-          
+
         </Routes>
       </main>
       <Footer />

@@ -1,19 +1,57 @@
 import React, { useState, useEffect } from "react";
-
-const heroImages = [
-  "https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_930/b_white/f_auto/q_auto/store/software/switch/70010000094158/a022cbeb7960a3ef9cf3cd1d828c3b990a940efa89ce48d09c671297218d6685",
-  "https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_930/b_white/f_auto/q_auto/store/software/switch/70010000096768/4680935f27bf5b08a5cca25268afca277c7b0f02ff1ccc89e0c86e5be5296c3c",
-];
+// 1. Import Firebase functions
+import { db } from "../firebase";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
 function HeroBanner() {
+  // 2. Change heroImages from a constant to State
+  const [heroImages, setHeroImages] = useState([
+    // Default placeholder while loading (optional)
+    "/assets/placeholder.png" 
+  ]);
+  
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // 3. New Effect to Fetch Data
   useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const gamesRef = collection(db, "games");
+        // Get the latest 8 games
+        const q = query(gamesRef, orderBy("createdAt", "desc"), limit(8));
+        const querySnapshot = await getDocs(q);
+
+        // Filter and Extract Banners
+        const banners = querySnapshot.docs
+          .map((doc) => {
+             const data = doc.data();
+             // Check if bannerUrl exists and has a src property
+             return data.bannerUrl?.src || null;
+          })
+          .filter((src) => src !== null); // Remove games that don't have banners
+
+        // Only update if we found banners
+        if (banners.length > 0) {
+          setHeroImages(banners);
+        }
+      } catch (error) {
+        console.error("Error fetching hero banners:", error);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  // 4. Slider Logic (Unchanged)
+  useEffect(() => {
+    // Only run interval if we have images
+    if (heroImages.length === 0) return;
+
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroImages.length]); // Added dependency
 
   const goToSlide = (index) => {
     setCurrentIndex(index);
@@ -29,15 +67,18 @@ function HeroBanner() {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
   };
 
+  // Prevent crash if no images exist yet
+  if (!heroImages || heroImages.length === 0) return null;
+
   return (
     <div className="relative h-[40vh] sm:h-[50vh] md:h-[65vh] lg:h-[85vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] w-full overflow-hidden">
       {/* Image Slides */}
       {heroImages.map((src, index) => (
         <img
-          key={src}
+          key={`${src}-${index}`} // Unique key
           src={src}
           alt={`Hero banner slide ${index + 1}`}
-          loading="lazy"
+          loading="eager" // Load banner immediately
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
             currentIndex === index ? "opacity-100" : "opacity-0"
           }`}
@@ -47,7 +88,7 @@ function HeroBanner() {
         />
       ))}
 
-      {/* Gradient Overlay for better text/button visibility */}
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30"></div>
 
       {/* Navigation Arrows - Hidden on small mobile */}
@@ -87,7 +128,7 @@ function HeroBanner() {
         ))}
       </div>
 
-      {/* Optional: Touch swipe indicators for mobile */}
+      {/* Mobile Swipe Indicators */}
       <div className="sm:hidden absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/70 text-xs">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />

@@ -6,6 +6,7 @@ import { dataProvider, authProvider } from "./firebaseProviders";
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
 import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
 import { ConfigEdit, ConfigList } from "./resources/Config"; 
+import { GhostList, GhostEdit, GhostCreate } from "./resources/GhostCollection";
 
 // Icons
 import GameIcon from '@mui/icons-material/SportsEsports';
@@ -60,6 +61,14 @@ function AdminApp() {
         create={ClientProjectCreate}
         options={{ label: 'Client Projects' }}
       />
+
+      <Resource 
+      name="ghostCollection" 
+      list={GhostList} 
+      edit={GhostEdit} 
+      create={GhostCreate} 
+      options={{ label: 'Ghost Portfolio' }} // Custom Sidebar Name
+    />
     </Admin>
   );
 }

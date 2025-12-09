@@ -8,19 +8,19 @@ import {
   SaveButton,
   useNotify,
   useRedirect
-} from 'react-admin';
-import { Navigate } from "react-router-dom"; 
+} from "react-admin";
+import { Navigate } from "react-router-dom";
 
 const SettingsToolbar = () => (
-    <Toolbar>
-        <SaveButton alwaysEnable />
-    </Toolbar>
+  <Toolbar>
+    <SaveButton alwaysEnable />
+  </Toolbar>
 );
 
-const SettingsTitle = () => 'Site Settings';
+const SettingsTitle = () => "Site Settings";
 
 export const ConfigList = () => {
-    return <Navigate to="/config/siteSettings" replace />;
+  return <Navigate to="/config/siteSettings" replace />;
 };
 
 export const ConfigEdit = () => {
@@ -28,9 +28,8 @@ export const ConfigEdit = () => {
   const redirect = useRedirect();
 
   const onSuccess = () => {
-      notify('Settings saved successfully!');
-      // Do NOT redirect. Stay on the page so you can see the changes.
-      redirect(false); 
+    notify("Settings saved successfully!");
+    redirect(false);
   };
 
   return (
@@ -40,13 +39,21 @@ export const ConfigEdit = () => {
       title={<SettingsTitle />}
       mutationOptions={{ onSuccess }}
       redirect={false}
-      // === ADD THIS LINE ===
       mutationMode="pessimistic"
-      // =====================
     >
       <SimpleForm toolbar={<SettingsToolbar />}>
+        {/* === NEW TAGLINE FIELD === */}
+        <h3 className="text-xl font-bold mt-4 mb-2">General Site Info</h3>
+        <TextInput
+          source="siteTagline"
+          label="Footer Tagline"
+          fullWidth
+          helperText="The short text that appears below the logo in the footer (e.g. 'Crafting cinematic worlds.')"
+        />
+        {/* ========================= */}
+
         {/* Game Logic Section */}
-        <h3 className="text-xl font-bold mt-4 mb-2">Game Automation</h3>
+        <h3 className="text-xl font-bold mt-6 mb-2">Game Automation</h3>
         <NumberInput
           source="newReleaseLimit"
           label="New Releases Count"
@@ -64,8 +71,10 @@ export const ConfigEdit = () => {
 
         {/* Social Media Section */}
         <h3 className="text-xl font-bold mt-6 mb-2">Social Media Links</h3>
-        <p className="text-sm text-gray-500 mb-4">Leave a field empty to hide the icon.</p>
-        
+        <p className="text-sm text-gray-500 mb-4">
+          Leave a field empty to hide the icon.
+        </p>
+
         <TextInput source="socialDiscord" label="Discord URL" fullWidth />
         <TextInput source="socialInstagram" label="Instagram URL" fullWidth />
         <TextInput source="socialLinkedin" label="LinkedIn URL" fullWidth />

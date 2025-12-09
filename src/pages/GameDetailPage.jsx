@@ -5,6 +5,7 @@ import { FaGooglePlay, FaApple, FaPlay, FaXmark, FaChevronLeft, FaChevronRight }
 import useGameBySlug from '../hooks/useGameBySlug';
 import steamLogo from "../assets/steam.png";
 import SmartImage from '../components/SmartImage';
+// Markdown import removed as requested
 
 function GameDetailPage() {
   const { slug } = useParams();
@@ -12,15 +13,22 @@ function GameDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
-  if (error || !game) return <div className="min-h-screen flex items-center justify-center text-red-500">Game not found.</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-white bg-[#0a0a0a]">Loading...</div>;
+  if (error || !game) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#0a0a0a]">Game not found.</div>;
 
   const videoId = game.youtubeUrl ? new URL(game.youtubeUrl).searchParams.get("v") : null;
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}` : null;
 
   const mainCoverSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
-
   const bannerSrc = game.bannerUrl?.src || game.bannerUrl || null;
+
+  // === FIX 1: Normalize Gallery Images ===
+  // Create a simple array of strings. If the gallery is empty/broken, this becomes an empty array.
+  // This solves the "Lightbox Not Showing" issue because we calculate the URLs ONCE.
+  const galleryUrls = game.galleryImages?.map(imgObj => {
+      return imgObj?.src?.src || imgObj?.src || "/assets/placeholder.png";
+  }) || [];
+  // =======================================
 
   const openLightbox = (index) => {
     setCurrentImageIndex(index);
@@ -31,12 +39,12 @@ function GameDetailPage() {
   
   const nextImage = (e) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % game.galleryImages.length);
+    setCurrentImageIndex((prev) => (prev + 1) % galleryUrls.length);
   };
 
   const prevImage = (e) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + game.galleryImages.length) % game.galleryImages.length);
+    setCurrentImageIndex((prev) => (prev - 1 + galleryUrls.length) % galleryUrls.length);
   };
 
   return (
@@ -49,14 +57,16 @@ function GameDetailPage() {
         </div>
       )}
 
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4 max-w-6xl relative z-30">
         
         <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
             <FaChevronLeft className="group-hover:-translate-x-1 transition-transform"/> Back to Games
         </Link>
 
-        <div className="flex flex-col lg:flex-row gap-10 mb-16">
+        {/* Top Section */}
+        <div className="flex flex-col lg:flex-row gap-10 mb-12">
             
+            {/* Left: Main Media */}
             <div className="lg:w-3/5 flex-shrink-0">
                 <div className="rounded-3xl overflow-hidden shadow-2xl border border-red-900/50 aspect-video relative bg-black">
                     {embedUrl ? (
@@ -74,6 +84,7 @@ function GameDetailPage() {
                 </div>
             </div>
 
+            {/* Right: Info & Buttons */}
             <div className="lg:w-2/5 flex flex-col justify-center">
                 <h1 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-wide uppercase drop-shadow-lg">{game.title}</h1>
                 
@@ -85,14 +96,7 @@ function GameDetailPage() {
                     ))}
                 </div>
 
-                {/* 🔥 UPDATED DESCRIPTION SECTION */}
-                <div className="text-lg text-gray-300 leading-relaxed mb-10 whitespace-pre-wrap font-light">
-                  {game.longDescription || game.description}
-                </div>
-                {/* -------------------------------- */}
-
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center">
-                    
                     {game.liveDemoUrl && (
                       <motion.a
                         href={game.liveDemoUrl}
@@ -160,24 +164,40 @@ function GameDetailPage() {
             </div>
         </div>
 
-        {game.galleryImages && game.galleryImages.length > 0 && (
+        {/* Description Section */}
+        <div className="mb-16">
+            <h2 className="text-3xl font-bold text-white mb-6 border-b border-gray-800 pb-4">About the Game</h2>
+            <div className="text-gray-300 text-lg leading-relaxed whitespace-pre-wrap font-light max-w-4xl">
+                {game.longDescription || game.description}
+            </div>
+        </div>
+
+        {/* Gallery Section */}
+        {galleryUrls.length > 0 && (
             <div className="mb-16">
                 <h2 className="text-3xl font-bold text-white mb-8 tracking-wide text-center"><span className="text-red-500">Gameplay</span> Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                    {game.galleryImages.map((imgObj, index) => {
-                         const imgSrc = imgObj?.src?.src || imgObj?.src || "/assets/placeholder.png";
-                         return (
+                    {/* === FIX 2: Use SmartImage in Grid === 
+                        This makes vertical screenshots look good in horizontal boxes 
+                    */}
+                    {galleryUrls.map((imgSrc, index) => (
                         <motion.div 
                             key={index}
                             whileHover={{ scale: 1.03 }}
-                            className="aspect-video rounded-2xl overflow-hidden border border-red-900/30 shadow-lg cursor-pointer bg-black/50 relative group"
+                            className="aspect-video rounded-2xl overflow-hidden border border-red-900/30 shadow-lg cursor-pointer bg-black relative group"
                             onClick={() => openLightbox(index)}
                         >
-                            <img src={imgSrc} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover group-hover:opacity-80 transition-opacity" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                            {/* Replaced <img> with <SmartImage> */}
+                            <SmartImage 
+                                src={imgSrc} 
+                                alt={`Screenshot ${index + 1}`} 
+                                className="w-full h-full"
+                            />
+                            
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors z-20"></div>
                         </motion.div>
-                         )
-                    })}
+                    ))}
                 </div>
             </div>
         )}
@@ -192,12 +212,12 @@ function GameDetailPage() {
                 className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
                 onClick={closeLightbox}
             >
-                <button className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors">
+                <button className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors z-50">
                     <FaXmark size={32} />
                 </button>
 
                 <div className="relative w-full max-w-5xl aspect-video" onClick={e => e.stopPropagation()}>
-                    {game.galleryImages.length > 1 && (
+                    {galleryUrls.length > 1 && (
                         <>
                         <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-red-600/80 rounded-full text-white transition-all z-10" onClick={prevImage}>
                             <FaChevronLeft size={24} />
@@ -208,14 +228,17 @@ function GameDetailPage() {
                         </>
                     )}
 
+                    {/* === FIX 3: Use the Normalized Array === 
+                        Since galleryUrls is a list of strings, we don't need complex checks here.
+                    */}
                     <img 
-                        src={game.galleryImages[currentImageIndex]?.src?.src || game.galleryImages[currentImageIndex]?.src} 
+                        src={galleryUrls[currentImageIndex]} 
                         alt={`Gallery Image ${currentImageIndex + 1}`} 
                         className="w-full h-full object-contain rounded-lg shadow-2xl border border-gray-800"
                     />
 
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-gray-400 text-sm bg-black/60 px-3 py-1 rounded-full">
-                        {currentImageIndex + 1} / {game.galleryImages.length}
+                        {currentImageIndex + 1} / {galleryUrls.length}
                     </div>
                 </div>
             </motion.div>

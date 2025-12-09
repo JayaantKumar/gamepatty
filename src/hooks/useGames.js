@@ -10,23 +10,29 @@ function useGames() {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
-        const gamesCollection = collection(db, 'games');
-        const q = query(gamesCollection, orderBy('releasedAt', 'desc'));
+        const gamesRef = collection(db, 'games');
+        // We fetch ALL games first (sorted by date)
+        const q = query(gamesRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
-        
-        const gamesList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        
+
+        const gamesList = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          // === THE FILTER LOGIC ===
+          .filter((game) => {
+            // If isVisible is explicitly FALSE, hide it.
+            // If it's TRUE or UNDEFINED (old games), show it.
+            return game.isVisible !== false;
+          });
+          // ========================
+
         setGames(gamesList);
+        setLoading(false);
       } catch (err) {
-        console.error("Error fetching games: ", err);
-        setError('Failed to fetch games. Please try again later.');
-      } finally {
+        console.error("Error fetching games:", err);
+        setError("Failed to load games.");
         setLoading(false);
       }
     };

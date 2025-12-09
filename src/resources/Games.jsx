@@ -5,7 +5,8 @@ import {
   List, Datagrid, TextField, DateField,
   Edit, Create, SimpleForm, TextInput, DateInput,
   ArrayInput, SimpleFormIterator, ImageInput, ImageField,
-  CloneButton
+  CloneButton,
+  BooleanInput, // <-- added
 } from 'react-admin';
 
 const SlugUpdater = () => {
@@ -42,6 +43,15 @@ export const GameList = () => (
 
 const GameForm = () => (
   <SimpleForm>
+    {/* === NEW VISIBILITY TOGGLE === */}
+    <BooleanInput 
+      source="isVisible" 
+      label="Show in 'Our Games' Section?" 
+      defaultValue={true}
+      helperText="If disabled, this game will be hidden from the website but saved in the database."
+    />
+    {/* ============================= */}
+
     <TextInput source="title" fullWidth />
     <TextInput 
       source="slug" 
@@ -131,8 +141,17 @@ export const GameCreate = () => (
       iosUrl: null,
       liveDemoUrl: null,
       steamUrl: null,
+      isVisible: true, // <--- Default new games to Visible
     }}>
       <SlugUpdater />
+
+      {/* === NEW VISIBILITY TOGGLE === */}
+      <BooleanInput 
+        source="isVisible" 
+        label="Show in 'Our Games' Section?" 
+        defaultValue={true}
+      />
+      {/* ============================= */}
 
       <TextInput source="title" fullWidth />
       <TextInput 

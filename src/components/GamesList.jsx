@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-// 1. Import FaSteam
-import { FaApple, FaGooglePlay, FaSteam } from "react-icons/fa6";
+import { FaApple, FaGooglePlay } from "react-icons/fa6";
 import useGames from "../hooks/useGames";
 import GameDetailModal from "./GameDetailModal";
+import steamLogo from "../assets/steam.png";
 
 const getEmbedUrl = (url) => {
   if (!url) return "";
@@ -42,7 +42,17 @@ function GamesList() {
         games.map((game, index) => {
           const embedUrl = getEmbedUrl(game.youtubeUrl);
           const reverse = index % 2 !== 0;
-          const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+          
+          // Universal Image Helper
+          const imageSrc = 
+            game.imageUrl?.src || 
+            game.imageUrl || 
+            game.bannerUrl?.src || // Fallback to banner if main image missing
+            "/assets/placeholder.png";
+
+          // === FIX: SAFETY CHECK FOR DESCRIPTION ===
+          const description = game.description || ""; // Defaults to empty string if null
+          // =======================================
 
           return (
             <div
@@ -87,9 +97,9 @@ function GamesList() {
                 </div>
 
                 <p className="text-gray-300 mb-8 text-[1rem] sm:text-[1.1rem] text-center md:text-left">
-                  {game.description.length > 220
-                    ? game.description.slice(0, 220) + "..."
-                    : game.description}
+                  {description.length > 220
+                    ? description.slice(0, 220) + "..."
+                    : description}
                 </p>
 
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 justify-center md:justify-start items-center">
@@ -102,7 +112,6 @@ function GamesList() {
 
                   <div className="flex gap-3 sm:gap-5 items-center">
                     
-                    {/* === ADDED STEAM BUTTON === */}
                     {game.steamUrl && (
                       <motion.a
                         href={game.steamUrl}
@@ -115,7 +124,7 @@ function GamesList() {
                         whileTap={{ scale: 0.95 }}
                         className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
                       >
-                        <FaSteam size={28} className="text-white" />
+                        <img src={steamLogo} alt="Steam" className="w-7 h-7 object-contain" />
                         <div className="flex flex-col text-left leading-tight">
                           <span className="text-xs text-gray-400">
                             Download on
@@ -126,7 +135,6 @@ function GamesList() {
                         </div>
                       </motion.a>
                     )}
-                    {/* ========================== */}
 
                     {game.iosUrl && (
                       <motion.a
@@ -191,13 +199,19 @@ function GamesList() {
 
           <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
             {games.map((game) => {
-               const imageSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+               // Universal Image Helper for Masonry
+               const imageSrc = 
+                 game.imageUrl?.src || 
+                 game.imageUrl || 
+                 game.bannerUrl?.src || 
+                 "/assets/placeholder.png";
+
                return (
                 <img
                   key={game.id}
                   src={imageSrc}
                   alt={game.title}
-                  className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer"
+                  className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer break-inside-avoid"
                   onClick={() => setSelectedGame(game)}
                 />
                );

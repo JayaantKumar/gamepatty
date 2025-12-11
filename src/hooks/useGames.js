@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 
 function useGames() {
   const [games, setGames] = useState([]);
@@ -8,10 +8,20 @@ function useGames() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+
+        // 1. Fetch the Limit from Site Settings
+        const settingsRef = doc(db, 'config', 'siteSettings');
+        const settingsSnap = await getDoc(settingsRef);
+        // Default to 10 if setting is not found
+        const limitCount = settingsSnap.exists() && settingsSnap.data().ourGamesLimit 
+          ? settingsSnap.data().ourGamesLimit 
+          : 10; 
+
+        // 2. Fetch All Games
         const gamesRef = collection(db, 'games');
-        // We fetch ALL games first (sorted by date)
         const q = query(gamesRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
 
@@ -20,13 +30,10 @@ function useGames() {
             id: doc.id,
             ...doc.data(),
           }))
-          // === THE FILTER LOGIC ===
-          .filter((game) => {
-            // If isVisible is explicitly FALSE, hide it.
-            // If it's TRUE or UNDEFINED (old games), show it.
-            return game.isVisible !== false;
-          });
-          // ========================
+          // 3. Filter Hidden Games
+          .filter((game) => game.isVisible !== false)
+          // 4. Apply the Limit
+          .slice(0, limitCount);
 
         setGames(gamesList);
         setLoading(false);
@@ -37,7 +44,7 @@ function useGames() {
       }
     };
 
-    fetchGames();
+    fetchData();
   }, []);
 
   return { games, loading, error };

@@ -3,11 +3,11 @@ import { db } from '../firebase';
 import { collection, getDocs, query } from 'firebase/firestore';
 
 function useAllPortfolioItems() {
-  const [items, setItems] = useState([]); // Changed from 'projects' to 'items'
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Safety Helper for Dates
+  // === 1. SAFETY DATE HELPER ===
   const getSafeDate = (dateField) => {
     if (!dateField) return 0;
     if (typeof dateField.toMillis === 'function') return dateField.toMillis();
@@ -16,6 +16,30 @@ function useAllPortfolioItems() {
     if (!isNaN(parsedDate.getTime())) return parsedDate.getTime();
     return 0;
   };
+
+  // === 2. UNIVERSAL IMAGE EXTRACTOR (THE FIX) ===
+  const getImgSrc = (imgField) => {
+    if (!imgField) return null;
+    
+    // Case A: It's an Array (common in React-Admin) -> Take first item
+    if (Array.isArray(imgField) && imgField.length > 0) {
+      return imgField[0].src?.src || imgField[0].src;
+    }
+    
+    // Case B: It's an Object with a 'src' property
+    if (typeof imgField === 'object' && imgField.src) {
+        // Sometimes it's nested like { src: { src: "url" } }
+        return imgField.src.src || imgField.src;
+    }
+
+    // Case C: It's just a String (URL)
+    if (typeof imgField === 'string') {
+        return imgField;
+    }
+
+    return null;
+  };
+  // ===============================================
 
   useEffect(() => {
     const fetchAllItems = async () => {
@@ -29,7 +53,7 @@ function useAllPortfolioItems() {
           getDocs(query(collection(db, 'ghostCollection'))),
         ]);
 
-        // Helper to process a document into MULTIPLE items
+        // Helper to process a document
         const processDoc = (doc, typePath) => {
           const data = doc.data();
           const projectId = doc.id;
@@ -38,11 +62,10 @@ function useAllPortfolioItems() {
           const createdAt = getSafeDate(data.createdAt);
           const generatedItems = [];
 
-          // 1. THE MAIN CARD (Video or Main Image)
-          // We prioritize YouTube. If no YouTube, we use the Main Image.
+          // 1. THE MAIN CARD
           if (data.youtubeUrl) {
              generatedItems.push({
-               id: `${projectId}-main-video`, // Unique ID
+               id: `${projectId}-main-video`,
                type: 'video',
                src: data.youtubeUrl,
                title: projectTitle,
@@ -50,8 +73,9 @@ function useAllPortfolioItems() {
                createdAt: createdAt
              });
           } else {
-             // If no video, create a Main Image card
-             const mainSrc = data.imageUrl?.src || data.imageUrl || data.bannerUrl?.src || "/assets/placeholder.png";
+             // Use the Universal Helper here
+             const mainSrc = getImgSrc(data.imageUrl) || getImgSrc(data.bannerUrl) || "/assets/placeholder.png";
+             
              generatedItems.push({
                id: `${projectId}-main-image`,
                type: 'image',
@@ -62,18 +86,18 @@ function useAllPortfolioItems() {
              });
           }
 
-          // 2. THE GALLERY CARDS (Add every single gallery image)
+          // 2. THE GALLERY CARDS
           if (data.galleryImages && Array.isArray(data.galleryImages)) {
             data.galleryImages.forEach((img, index) => {
-              const gallerySrc = img?.src || img; // Handle object vs string
+              const gallerySrc = getImgSrc(img); // Use Helper here too
               if (gallerySrc) {
                 generatedItems.push({
-                  id: `${projectId}-gallery-${index}`, // Unique ID
+                  id: `${projectId}-gallery-${index}`,
                   type: 'image',
                   src: gallerySrc,
-                  title: projectTitle, // Keep same title
-                  linkUrl: linkUrl,    // Link to same project
-                  createdAt: createdAt // Keep same date so they stay grouped
+                  title: projectTitle,
+                  linkUrl: linkUrl,
+                  createdAt: createdAt
                 });
               }
             });
@@ -82,14 +106,14 @@ function useAllPortfolioItems() {
           return generatedItems;
         };
 
-        // Process all collections and FLATTEN them into one big list
+        // Flatten all collections
         const allItems = [
           ...gamesSnap.docs.flatMap(doc => processDoc(doc, 'specificgame')),
           ...clientSnap.docs.flatMap(doc => processDoc(doc, 'clientproject')),
           ...ghostSnap.docs.flatMap(doc => processDoc(doc, 'ghostproject')),
         ];
 
-        // Sort by Newest First
+        // Sort by Date
         allItems.sort((a, b) => b.createdAt - a.createdAt);
 
         setItems(allItems);
@@ -105,7 +129,7 @@ function useAllPortfolioItems() {
     fetchAllItems();
   }, []);
 
-  return { items, loading, error }; // Returning 'items' now
+  return { items, loading, error };
 }
 
 export default useAllPortfolioItems;

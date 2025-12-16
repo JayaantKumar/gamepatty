@@ -7,7 +7,7 @@ function useAllPortfolioItems() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // === 1. SAFETY DATE HELPER ===
+  // Safety Date Helper
   const getSafeDate = (dateField) => {
     if (!dateField) return 0;
     if (typeof dateField.toMillis === 'function') return dateField.toMillis();
@@ -17,29 +17,14 @@ function useAllPortfolioItems() {
     return 0;
   };
 
-  // === 2. UNIVERSAL IMAGE EXTRACTOR (THE FIX) ===
+  // Universal Image Helper
   const getImgSrc = (imgField) => {
     if (!imgField) return null;
-    
-    // Case A: It's an Array (common in React-Admin) -> Take first item
-    if (Array.isArray(imgField) && imgField.length > 0) {
-      return imgField[0].src?.src || imgField[0].src;
-    }
-    
-    // Case B: It's an Object with a 'src' property
-    if (typeof imgField === 'object' && imgField.src) {
-        // Sometimes it's nested like { src: { src: "url" } }
-        return imgField.src.src || imgField.src;
-    }
-
-    // Case C: It's just a String (URL)
-    if (typeof imgField === 'string') {
-        return imgField;
-    }
-
+    if (Array.isArray(imgField) && imgField.length > 0) return imgField[0].src?.src || imgField[0].src;
+    if (typeof imgField === 'object' && imgField.src) return imgField.src.src || imgField.src;
+    if (typeof imgField === 'string') return imgField;
     return null;
   };
-  // ===============================================
 
   useEffect(() => {
     const fetchAllItems = async () => {
@@ -53,50 +38,51 @@ function useAllPortfolioItems() {
           getDocs(query(collection(db, 'ghostCollection'))),
         ]);
 
-        // Helper to process a document
-        const processDoc = (doc, typePath) => {
+        const processDoc = (doc) => {
           const data = doc.data();
+          // === KEY CHANGE: Store the Full Data Object ===
+          // We need this so the Modal has access to everything (description, tags, etc.)
+          const fullData = { id: doc.id, ...data }; 
+          // ==============================================
+          
           const projectId = doc.id;
           const projectTitle = data.title;
-          const linkUrl = `/${typePath}/${data.slug}`;
           const createdAt = getSafeDate(data.createdAt);
           const generatedItems = [];
 
-          // 1. THE MAIN CARD
+          // 1. Main Card
           if (data.youtubeUrl) {
              generatedItems.push({
                id: `${projectId}-main-video`,
                type: 'video',
                src: data.youtubeUrl,
                title: projectTitle,
-               linkUrl: linkUrl,
+               originalData: fullData, // Pass full data
                createdAt: createdAt
              });
           } else {
-             // Use the Universal Helper here
              const mainSrc = getImgSrc(data.imageUrl) || getImgSrc(data.bannerUrl) || "/assets/placeholder.png";
-             
              generatedItems.push({
                id: `${projectId}-main-image`,
                type: 'image',
                src: mainSrc,
                title: projectTitle,
-               linkUrl: linkUrl,
+               originalData: fullData, // Pass full data
                createdAt: createdAt
              });
           }
 
-          // 2. THE GALLERY CARDS
+          // 2. Gallery Cards
           if (data.galleryImages && Array.isArray(data.galleryImages)) {
             data.galleryImages.forEach((img, index) => {
-              const gallerySrc = getImgSrc(img); // Use Helper here too
+              const gallerySrc = getImgSrc(img);
               if (gallerySrc) {
                 generatedItems.push({
                   id: `${projectId}-gallery-${index}`,
                   type: 'image',
                   src: gallerySrc,
                   title: projectTitle,
-                  linkUrl: linkUrl,
+                  originalData: fullData, // Pass full data
                   createdAt: createdAt
                 });
               }
@@ -106,16 +92,13 @@ function useAllPortfolioItems() {
           return generatedItems;
         };
 
-        // Flatten all collections
         const allItems = [
-          ...gamesSnap.docs.flatMap(doc => processDoc(doc, 'specificgame')),
-          ...clientSnap.docs.flatMap(doc => processDoc(doc, 'clientproject')),
-          ...ghostSnap.docs.flatMap(doc => processDoc(doc, 'ghostproject')),
+          ...gamesSnap.docs.flatMap(doc => processDoc(doc)),
+          ...clientSnap.docs.flatMap(doc => processDoc(doc)),
+          ...ghostSnap.docs.flatMap(doc => processDoc(doc)),
         ];
 
-        // Sort by Date
         allItems.sort((a, b) => b.createdAt - a.createdAt);
-
         setItems(allItems);
 
       } catch (err) {

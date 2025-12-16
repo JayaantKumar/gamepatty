@@ -1,285 +1,204 @@
-import React, { useState } from "react";
-// 1. Import motion and store icons
-import { motion } from "framer-motion";
-import { FaApple, FaGooglePlay, FaSteam } from "react-icons/fa";  // FaSteam added
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGooglePlay, FaApple, FaPlay, FaXmark, FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
+import steamLogo from "../assets/steam.png";
+import SmartImage from './SmartImage';
 
+// Helper to handle both Game and Client Project data structures
 const getEmbedUrl = (url) => {
   if (!url) return "";
   try {
     const videoId = new URL(url).searchParams.get("v");
     if (videoId) {
-      // Keep autoplay off for the modal video
       return `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}`;
     }
     return "";
-  } catch (e) {
-    console.error("Invalid YouTube URL provided:", url);
+  } catch {
     return "";
   }
 };
 
 function GameDetailModal({ game, onClose }) {
-  const [lightboxImage, setLightboxImage] = useState(null);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!game) return null;
 
-  const embedUrl = getEmbedUrl(game.youtubeUrl);
-  const imagesToShow =
-    game.galleryImages && game.galleryImages.length > 0
-      ? game.galleryImages
-      : [game.imageUrl];
+  // 1. DATA NORMALIZATION (Fixes missing images)
+  const videoId = game.youtubeUrl ? new URL(game.youtubeUrl).searchParams.get("v") : null;
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}` : null;
+  
+  // Handle Main Image (Objects vs Strings)
+  const mainCoverSrc = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
+  const bannerSrc = game.bannerUrl?.src || game.bannerUrl || null;
 
-  const openLightbox = (imgUrl, index) => {
-    setLightboxImage(imgUrl);
-    setLightboxIndex(index);
+  // Handle Gallery Images (The Fix for empty popups)
+  const galleryUrls = game.galleryImages?.map(imgObj => {
+      // Check all possible nesting levels React-Admin might create
+      return imgObj?.src?.src || imgObj?.src || imgObj || "/assets/placeholder.png";
+  }) || [];
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % galleryUrls.length);
   };
 
-  const closeLightbox = () => setLightboxImage(null);
-
-  const showPreviousImage = (e) => {
+  const prevImage = (e) => {
     e.stopPropagation();
-    const newIndex =
-      (lightboxIndex - 1 + imagesToShow.length) % imagesToShow.length;
-    setLightboxIndex(newIndex);
-    setLightboxImage(imagesToShow[newIndex]);
-  };
-
-  const showNextImage = (e) => {
-    e.stopPropagation();
-    const newIndex = (lightboxIndex + 1) % imagesToShow.length;
-    setLightboxIndex(newIndex);
-    setLightboxImage(imagesToShow[newIndex]);
+    setCurrentImageIndex((prev) => (prev - 1 + galleryUrls.length) % galleryUrls.length);
   };
 
   return (
-    <>
-      {/* Main Modal */}
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
         onClick={onClose}
       >
-        <div
-          className="relative bg-[#111] text-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-[#0f0f0f] w-full max-w-6xl rounded-3xl overflow-hidden shadow-2xl border border-red-900/30 relative my-8"
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
         >
-          {/* Close button */}
+          {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white text-4xl hover:text-[#ff784e] transition-all z-10"
+            className="absolute top-4 right-4 z-50 bg-black/50 hover:bg-red-600 text-white p-2 rounded-full transition-all"
           >
-            &times;
+            <FaXmark size={24} />
           </button>
 
-          {/* Video or Main Image */}
-          <div className="w-full aspect-video">
-            {embedUrl ? (
-              <iframe
-                src={embedUrl}
-                title={game.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full rounded-t-2xl"
-              ></iframe>
-            ) : (
-              <img
-                src={game.imageUrl}
-                alt={game.title}
-                className="w-full h-full object-cover rounded-t-2xl"
-              />
+          {/* === SCROLLABLE CONTENT AREA === */}
+          <div className="max-h-[90vh] overflow-y-auto custom-scrollbar">
+            
+            {/* Banner (If exists) */}
+            {bannerSrc && (
+                <div className="w-full h-[250px] md:h-[350px] relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-transparent to-transparent z-10"></div>
+                    <SmartImage src={bannerSrc} alt="Banner" className="w-full h-full" isBanner={true} />
+                </div>
             )}
-          </div>
 
-          {/* Content */}
-          <div className="p-8">
-            <h2 className="text-4xl font-extrabold mb-4 tracking-wide">
-              {game.title}
-            </h2>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              {game.tags?.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-[#ff5722]/10 text-[#ff784e] font-semibold px-4 py-1 rounded-full text-sm border border-[#ff784e]/30"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <p className="text-gray-300 text-lg leading-relaxed mb-8">
-              {game.description}
-            </p>
-
-            {/* === 2. UPDATED BUTTON STYLES === */}
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mb-10">
-
-              {game.iosUrl && (
-                <motion.a
-                  href={game.iosUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0px 0px 15px rgba(255,255,255,0.15)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
-                >
-                  <FaApple size={28} className="text-white" />
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="text-xs text-gray-400">
-                      Download on the
-                    </span>
-                    <span className="text-sm font-semibold text-white">
-                      App Store
-                    </span>
-                  </div>
-                </motion.a>
-              )}
-
-              {game.androidUrl && (
-                <motion.a
-                  href={game.androidUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0px 0px 15px rgba(0,255,100,0.15)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
-                >
-                  <FaGooglePlay size={24} className="text-green-400" />
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="text-xs text-gray-400">
-                      Get it on
-                    </span>
-                    <span className="text-sm font-semibold text-white">
-                      Google Play
-                    </span>
-                  </div>
-                </motion.a>
-              )}
-
-              {/* === ADDED STEAM BUTTON (NOTHING ELSE CHANGED) === */}
-              {game.steamUrl && (
-                <motion.a
-                  href={game.steamUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0px 0px 15px rgba(23,26,33,0.5)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
-                >
-                  <FaSteam size={28} className="text-white" />
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="text-xs text-gray-400">Download on</span>
-                    <span className="text-sm font-semibold text-white">
-                      Steam
-                    </span>
-                  </div>
-                </motion.a>
-              )}
-              {/* =============================== */}
-
-            </div>
-            {/* === END OF BUTTON UPDATE === */}
-
-            {/* Gallery */}
-            <div>
-              <h3 className="text-3xl font-bold mb-5 text-white">Gallery</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {imagesToShow.map((imgUrl, index) => (
-                  <div
-                    key={index}
-                    className="overflow-hidden rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,87,34,0.4)] cursor-pointer relative group"
-                    onClick={() => openLightbox(imgUrl, index)}
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`${game.title} gallery image ${index + 1}`}
-                      className="w-full h-auto"
-                    />
-
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                      <svg
-                        className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                        />
-                      </svg>
+            <div className="p-6 md:p-10 relative z-20">
+                {/* Top Section: Media + Info */}
+                <div className="flex flex-col lg:flex-row gap-8 mb-10">
+                    
+                    {/* Left: Media */}
+                    <div className="lg:w-3/5">
+                        <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-800 aspect-video bg-black relative">
+                            {embedUrl ? (
+                                <iframe
+                                    src={embedUrl}
+                                    title={game.title}
+                                    className="w-full h-full"
+                                    frameBorder="0"
+                                    allowFullScreen
+                                ></iframe>
+                            ) : (
+                                <SmartImage src={mainCoverSrc} alt={game.title} className="w-full h-full" />
+                            )}
+                        </div>
                     </div>
-                  </div>
-                ))}
-              </div>
 
-              {imagesToShow.length === 0 && (
-                <p className="text-gray-500 mt-4">
-                  No gallery images available.
-                </p>
-              )}
+                    {/* Right: Details */}
+                    <div className="lg:w-2/5 flex flex-col justify-center">
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-4 uppercase">{game.title}</h2>
+                        
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {game.tags?.map((tag, i) => (
+                                <span key={i} className="px-3 py-1 text-xs font-bold uppercase text-red-200 bg-red-900/50 rounded-full border border-red-500/30">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex flex-wrap gap-3">
+                            {/* Logic to show Live Demo OR Client URL */}
+                            {(game.liveDemoUrl || game.clientUrl) && (
+                                <a
+                                    href={game.liveDemoUrl || game.clientUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-lg"
+                                >
+                                    <FaPlay /> {game.liveDemoUrl ? "Play Demo" : "View Live"}
+                                </a>
+                            )}
+                            
+                            {/* App Stores */}
+                            {game.steamUrl && (
+                                <a href={game.steamUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl text-white transition-all">
+                                    <img src={steamLogo} alt="Steam" className="w-6 h-6 object-contain" /> Steam
+                                </a>
+                            )}
+                            {game.iosUrl && (
+                                <a href={game.iosUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#1a1a1a] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl text-white transition-all">
+                                    <FaApple size={20} /> App Store
+                                </a>
+                            )}
+                            {game.androidUrl && (
+                                <a href={game.androidUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#1a1a1a] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl text-white transition-all">
+                                    <FaGooglePlay size={18} className="text-green-500" /> Google Play
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Description */}
+                <div className="mb-10 text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {game.longDescription || game.description}
+                </div>
+
+                {/* Gallery Slideshow */}
+                {galleryUrls.length > 0 && (
+                    <div className="border-t border-gray-800 pt-8">
+                        <h3 className="text-2xl font-bold text-white mb-6 text-center">Gallery</h3>
+                        
+                        <div className="relative w-full aspect-video max-w-4xl mx-auto bg-black rounded-xl overflow-hidden border border-gray-800">
+                             {/* Arrows */}
+                             {galleryUrls.length > 1 && (
+                                <>
+                                <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-white hover:bg-red-600 transition-all z-10"><FaChevronLeft /></button>
+                                <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-white hover:bg-red-600 transition-all z-10"><FaChevronRight /></button>
+                                </>
+                             )}
+                             
+                             {/* Image */}
+                             <img 
+                                src={galleryUrls[currentImageIndex]} 
+                                alt="Gallery" 
+                                className="w-full h-full object-contain"
+                             />
+
+                             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 px-3 py-1 rounded-full text-white text-xs">
+                                {currentImageIndex + 1} / {galleryUrls.length}
+                             </div>
+                        </div>
+
+                        {/* Thumbnails */}
+                        <div className="flex gap-2 overflow-x-auto mt-4 pb-2 justify-center">
+                            {galleryUrls.map((src, idx) => (
+                                <button 
+                                    key={idx} 
+                                    onClick={() => setCurrentImageIndex(idx)}
+                                    className={`w-20 h-12 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${currentImageIndex === idx ? 'border-red-600 opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                                >
+                                    <img src={src} className="w-full h-full object-cover" alt="thumb" />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Lightbox Modal */}
-      {lightboxImage && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-sm"
-          onClick={closeLightbox}
-        >
-          <button
-            onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white text-5xl hover:text-[#ff784e] transition-all z-[70]"
-          >
-            &times;
-          </button>
-
-          {imagesToShow.length > 1 && (
-            <button
-              onClick={showPreviousImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-5xl hover:text-[#ff784e] transition-all z-[70] bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
-            >
-              ‹
-            </button>
-          )}
-
-          {imagesToShow.length > 1 && (
-            <button
-              onClick={showNextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-5xl hover:text-[#ff784e] transition-all z-[70] bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:bg-black/70"
-            >
-              ›
-            </button>
-          )}
-
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-lg bg-black/50 px-4 py-2 rounded-full z-[70]">
-            {lightboxIndex + 1} / {imagesToShow.length}
-          </div>
-
-          <img
-            src={lightboxImage}
-            alt="Full size"
-            className="max-w-[90vw] max-h-[90vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
-    </>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

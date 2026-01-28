@@ -1,8 +1,12 @@
 import React, { useEffect } from 'react';
 import { Admin, Resource } from "react-admin";
-import { dataProvider, authProvider } from "./firebaseProviders"; 
+import { dataProvider, authProvider } from "./firebaseProviders";
+
+// 1. Import the New Custom Login Page
+import AdminLoginPage from './components/AdminLoginPage';
 
 // Resources
+import { PageList, PageEdit, PageCreate } from "./resources/StaticPages"; 
 import { GameList, GameEdit, GameCreate } from "./resources/Games";
 import { ClientProjectList, ClientProjectEdit, ClientProjectCreate } from "./resources/ClientProjects";
 import { ConfigEdit, ConfigList } from "./resources/Config"; 
@@ -36,6 +40,10 @@ function AdminApp() {
       // which prevents conflicts with your main site.
       dataProvider={dataProvider}
       authProvider={authProvider}
+      
+      // === NEW: USE CUSTOM GOOGLE LOGIN PAGE ===
+      loginPage={AdminLoginPage}
+      // ========================================
     >
       <Resource
         name="config"
@@ -63,12 +71,21 @@ function AdminApp() {
       />
 
       <Resource 
-      name="ghostCollection" 
-      list={GhostList} 
-      edit={GhostEdit} 
-      create={GhostCreate} 
-      options={{ label: 'Ghost Portfolio' }} // Custom Sidebar Name
-    />
+        name="ghostCollection" 
+        list={GhostList} 
+        edit={GhostEdit} 
+        create={GhostCreate} 
+        options={{ label: 'Ghost Portfolio' }} // Custom Sidebar Name
+      />
+
+      <Resource 
+        name="pages" 
+        list={PageList} 
+        edit={PageEdit} 
+        create={PageCreate} 
+        options={{ label: 'Site Pages' }} // Sidebar Name
+      />
+    
     </Admin>
   );
 }

@@ -1,34 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaDiscord, FaInstagram, FaLinkedin, FaXTwitter, FaYoutube } from 'react-icons/fa6';
-// 1. Import EmailJS
-import emailjs from '@emailjs/browser';
-
-// === CONFIGURE YOUR EMAILJS KEYS HERE ===
-const SERVICE_ID = "YOUR_SERVICE_ID";   // e.g. service_m9p...
-const TEMPLATE_ID = "YOUR_TEMPLATE_ID"; // e.g. template_23d...
-const PUBLIC_KEY = "YOUR_PUBLIC_KEY";   // e.g. user_82j...
-// ========================================
 
 function ContactPage() {
-  const form = useRef(); // Create a reference to the form
   const [loading, setLoading] = useState(false);
 
-  const sendEmail = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
-
-    emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY)
-      .then((result) => {
-          console.log(result.text);
-          alert("Message Sent Successfully! We will get back to you soon.");
-          setLoading(false);
-          e.target.reset(); // Clear the form
-      }, (error) => {
-          console.log(error.text);
-          alert("Failed to send message. Please try again later.");
-          setLoading(false);
-      });
+    
+    // Simulate sending (just a demo)
+    setTimeout(() => {
+        alert("Form submitted (this is a demo)");
+        setLoading(false);
+        e.target.reset(); 
+    }, 1000);
   };
 
   return (
@@ -57,14 +43,12 @@ function ContactPage() {
           >
             <h2 className="text-2xl font-bold mb-6 text-white">Send a Message</h2>
             
-            {/* 2. Attach ref={form} and onSubmit={sendEmail} */}
-            <form ref={form} onSubmit={sendEmail} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               
               <div>
                 <label className="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Name</label>
                 <input 
                   type="text" 
-                  name="from_name" // Must match EmailJS template variable
                   required
                   placeholder="John Doe"
                   className="w-full bg-[#0a0a0a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-600 transition-colors"
@@ -75,7 +59,6 @@ function ContactPage() {
                 <label className="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Email</label>
                 <input 
                   type="email" 
-                  name="from_email" // Must match EmailJS template variable
                   required
                   placeholder="john@example.com"
                   className="w-full bg-[#0a0a0a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-600 transition-colors"
@@ -85,7 +68,6 @@ function ContactPage() {
               <div>
                 <label className="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Message</label>
                 <textarea 
-                  name="message" // Must match EmailJS template variable
                   required
                   rows="5"
                   placeholder="Tell us about your project..."

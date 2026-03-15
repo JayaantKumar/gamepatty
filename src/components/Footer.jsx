@@ -6,13 +6,14 @@ import {
   FaLinkedin,
   FaYoutube,
   FaXTwitter,
+  FaLock, // Imported the Lock Icon
 } from "react-icons/fa6";
-import useSiteSettings from "../hooks/useSiteSettings"; // 1. Import Hook
+import useSiteSettings from "../hooks/useSiteSettings";
 
 function Footer() {
-  const { settings } = useSiteSettings(); // 2. Get Settings
+  const { settings } = useSiteSettings();
 
-  // 3. Helper to generate social links array dynamically
+  // Helper to generate social links array dynamically
   const getSocialLinks = () => {
     if (!settings) return [];
     const links = [];
@@ -138,7 +139,7 @@ function Footer() {
           <h4 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">
             Contact Us
           </h4>
-          {/* 4. Use Dynamic Data */}
+          {/* Use Dynamic Data */}
           <p className="text-[1rem] sm:text-[1.1rem]">
             {settings?.contactAddress1 || "Address Line 1"}
           </p>
@@ -178,6 +179,15 @@ function Footer() {
           Built with ❤️ by{" "}
           <span className="text-[#ff5722] font-semibold">GamePatty Studios</span>
         </p>
+
+        {/* === THE SECRET ADMIN BUTTON === */}
+        <div className="mt-8 flex justify-center opacity-20 hover:opacity-100 transition-opacity">
+            <Link to="/admin" className="p-2 text-gray-500 hover:text-red-500">
+                <FaLock size={12} />
+            </Link>
+        </div>
+        {/* =============================== */}
+
       </div>
     </footer>
   );

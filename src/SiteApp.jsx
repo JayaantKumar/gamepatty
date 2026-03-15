@@ -11,13 +11,19 @@ import PortfolioPage from "./pages/PortfolioPage";
 // Import the new generic page
 import DynamicContentPage from "./pages/DynamicContentPage";
 
-// REMOVED: Imports for old static pages (PrivacyPolicyPage, AboutUsPage, etc.)
-// We don't need them anymore because DynamicContentPage handles them now.
+// 1. IMPORT THE ADMIN APP
+import AdminApp from "./AdminApp";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* We only show Header/Footer if we are NOT in the Admin Panel.
+         (The Admin Panel has its own layout).
+      */}
+      
+      {/* Check if URL contains '/admin'. If yes, hide Header. */}
+      {!window.location.hash.includes("admin") && !window.location.pathname.startsWith("/admin") && <Header />}
+
       <main className="flex-grow">
         <Routes>
           {/* Main Routes */}
@@ -41,8 +47,6 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
 
           {/* === DYNAMIC CONTENT PAGES === */}
-          {/* The Footer links point here. This component fetches data from Firebase */}
-          
           <Route
             path="/privacy-policy"
             element={<DynamicContentPage pageSlug="privacy-policy" />}
@@ -59,9 +63,17 @@ function App() {
             path="/about"
             element={<DynamicContentPage pageSlug="about-us" />}
           />
+
+          {/* === 2. THE SECRET ADMIN ROUTE === */}
+          {/* The '*' is crucial! It tells React Router: 
+              "Let AdminApp handle everything that comes after /admin" */}
+          <Route path="/admin/*" element={<AdminApp />} />
+
         </Routes>
       </main>
-      <Footer />
+
+      {/* Check if URL contains '/admin'. If yes, hide Footer. */}
+      {!window.location.hash.includes("admin") && !window.location.pathname.startsWith("/admin") && <Footer />}
     </div>
   );
 }

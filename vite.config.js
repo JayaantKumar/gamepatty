@@ -1,11 +1,7 @@
-//import { defineConfig } from 'vite'
-//import react from '@vitejs/plugin-react'
-
-
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [
@@ -14,6 +10,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      
+      // === THE FIX: INCREASE CACHE LIMIT TO 5MB ===
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5000000
+      },
+      // ============================================
+
       manifest: {
         name: 'GamePatty Admin',
         short_name: 'GamePatty',

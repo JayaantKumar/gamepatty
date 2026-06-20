@@ -6,8 +6,6 @@ const options = {
   logging: true,
   rootRef: '', 
   dontAddId: true,
-  // 2. PASS THE STORAGE INSTANCE HERE
-  // This tells the library exactly where to upload files.
   storage: storage, 
 };
 

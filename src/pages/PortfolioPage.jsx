@@ -67,7 +67,7 @@ function PortfolioPage() {
                         <img
                           src={item.src}
                           alt={item.title}
-                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full rounded-2xl shadow-lg border border-red-900 hover:scale-[1.02] hover:opacity-90 transition-all cursor-pointer break-inside-avoid mb-4 object-cover max-h-[500px] min-h-[250px] group-hover:scale-105"
                           loading="lazy"
                         />
                     </div>

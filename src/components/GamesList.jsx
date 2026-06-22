@@ -43,16 +43,11 @@ function GamesList() {
           const embedUrl = getEmbedUrl(game.youtubeUrl);
           const reverse = index % 2 !== 0;
           
-          // Universal Image Helper
-          const imageSrc = 
-            game.imageUrl?.src || 
-            game.imageUrl || 
-            game.bannerUrl?.src || // Fallback to banner if main image missing
-            "/assets/placeholder.png";
+          // Identify which image to use
+          const wideBanner = game.bannerImage?.src || game.bannerUrl?.src;
+          const squareIcon = game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
 
-          // === FIX: SAFETY CHECK FOR DESCRIPTION ===
-          const description = game.description || ""; // Defaults to empty string if null
-          // =======================================
+          const description = game.description || ""; 
 
           return (
             <div
@@ -71,12 +66,22 @@ function GamesList() {
                     allowFullScreen
                     className="w-full aspect-video rounded-3xl shadow-2xl border border-red-900"
                   ></iframe>
-                ) : (
+                ) : wideBanner ? (
+                  // If wide banner exists, use object-cover to fill the space
                   <img
-                    src={imageSrc}
+                    src={wideBanner}
                     alt={game.title}
                     className="w-full rounded-3xl shadow-2xl border border-red-900 object-cover aspect-video"
                   />
+                ) : (
+                  // If only square icon exists, use object-contain and center it in a dark box
+                  <div className="w-full aspect-video rounded-3xl shadow-2xl border border-red-900 bg-[#111] flex items-center justify-center p-6">
+                    <img
+                        src={squareIcon}
+                        alt={game.title}
+                        className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
                 )}
               </div>
 
@@ -111,75 +116,30 @@ function GamesList() {
                   </Link>
 
                   <div className="flex gap-3 sm:gap-5 items-center">
-                    
                     {game.steamUrl && (
-                      <motion.a
-                        href={game.steamUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0px 0px 15px rgba(23, 26, 33, 0.5)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all"
-                      >
+                      <motion.a href={game.steamUrl} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(23, 26, 33, 0.5)" }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2 bg-[#171a21] border border-gray-600 hover:border-gray-400 px-4 py-2 rounded-xl transition-all">
                         <img src={steamLogo} alt="Steam" className="w-7 h-7 object-contain" />
                         <div className="flex flex-col text-left leading-tight">
-                          <span className="text-xs text-gray-400">
-                            Download on
-                          </span>
-                          <span className="text-sm font-semibold text-white">
-                            Steam
-                          </span>
+                          <span className="text-xs text-gray-400">Download on</span>
+                          <span className="text-sm font-semibold text-white">Steam</span>
                         </div>
                       </motion.a>
                     )}
-
                     {game.iosUrl && (
-                      <motion.a
-                        href={game.iosUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0px 0px 15px rgba(255,255,255,0.15)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
-                      >
+                      <motion.a href={game.iosUrl} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(255,255,255,0.15)" }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all">
                         <FaApple size={28} className="text-white" />
                         <div className="flex flex-col text-left leading-tight">
-                          <span className="text-xs text-gray-400">
-                            Download on the
-                          </span>
-                          <span className="text-sm font-semibold text-white">
-                            App Store
-                          </span>
+                          <span className="text-xs text-gray-400">Download on the</span>
+                          <span className="text-sm font-semibold text-white">App Store</span>
                         </div>
                       </motion.a>
                     )}
-
                     {game.androidUrl && (
-                      <motion.a
-                        href={game.androidUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0px 0px 15px rgba(0,255,100,0.15)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all"
-                      >
+                      <motion.a href={game.androidUrl} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(0,255,100,0.15)" }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2 bg-[#111111] border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-all">
                         <FaGooglePlay size={24} className="text-green-400" />
                         <div className="flex flex-col text-left leading-tight">
-                          <span className="text-xs text-gray-400">
-                            Get it on
-                          </span>
-                          <span className="text-sm font-semibold text-white">
-                            Google Play
-                          </span>
+                          <span className="text-xs text-gray-400">Get it on</span>
+                          <span className="text-sm font-semibold text-white">Google Play</span>
                         </div>
                       </motion.a>
                     )}
@@ -190,7 +150,6 @@ function GamesList() {
           );
         })}
 
-      {/* Masonry Layout – Only Primary Images */}
       {!loading && !error && games.length > 0 && (
         <div className="mt-24">
           <h3 className="text-3xl sm:text-4xl font-bold text-center text-white mb-10">
@@ -199,12 +158,7 @@ function GamesList() {
 
           <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
             {games.map((game) => {
-               // Universal Image Helper for Masonry
-               const imageSrc = 
-                 game.imageUrl?.src || 
-                 game.imageUrl || 
-                 game.bannerUrl?.src || 
-                 "/assets/placeholder.png";
+               const imageSrc = game.bannerImage?.src || game.bannerUrl?.src || game.imageUrl?.src || game.imageUrl || "/assets/placeholder.png";
 
                return (
                 <img
@@ -221,10 +175,7 @@ function GamesList() {
       )}
 
       {selectedGame && (
-        <GameDetailModal
-          game={selectedGame}
-          onClose={() => setSelectedGame(null)}
-        />
+        <GameDetailModal game={selectedGame} onClose={() => setSelectedGame(null)} />
       )}
     </section>
   );

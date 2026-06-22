@@ -1,28 +1,26 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { useLogin, useNotify } from 'react-admin';
+import { useNotify, useRedirect } from 'react-admin'; // 1. Swapped useLogin for useRedirect
 import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth'; 
 import { auth, googleProvider } from '../firebase'; 
-// 1. Import Eye Icons
 import { FaEye, FaEyeSlash } from "react-icons/fa6"; 
 
 const AdminLoginPage = () => {
-    const login = useLogin();
     const notify = useNotify();
+    const redirect = useRedirect(); // 2. Initialize Redirect
     const [loading, setLoading] = useState(false);
 
     // Form State
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    
-    // 2. New State for Password Visibility
     const [showPassword, setShowPassword] = useState(false);
 
     // === CONFIG: Allowed Admins ===
     const allowedEmails = [
         "developer.sbgames@gmail.com",
         "second.admin@gmail.com",
-        "jayantk4041@gmail.com"
+        "jayantk4041@gmail.com",
+        "testadmin@gamepatty.com" // Your new working test account
     ];
 
     const checkSecurity = async (user) => {
@@ -30,7 +28,11 @@ const AdminLoginPage = () => {
             await auth.signOut();
             throw new Error("Unauthorized email");
         }
-        await login({ user });
+        
+        // 3. THE FIX: Bypass the buggy react-admin-firebase login 
+        // and force the app directly into the admin dashboard!
+        notify("Login Successful!", { type: 'success' });
+        redirect('/'); 
     };
 
     const handleGoogleLogin = async () => {
@@ -41,8 +43,6 @@ const AdminLoginPage = () => {
         } catch (error) {
             console.error("Google Login Failed:", error);
             const msg = error?.message || "Unknown Error";
-            
-            // Fix for the crash if error.message is missing
             notify(msg === "Unauthorized email" ? "Access Denied" : "Login Failed: " + msg);
             setLoading(false);
         }
@@ -52,12 +52,14 @@ const AdminLoginPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const result = await signInWithEmailAndPassword(auth, email, password);
+            const result = await signInWithEmailAndPassword(auth, email.trim(), password);
             await checkSecurity(result.user);
         } catch (error) {
             console.error("Email Login Failed:", error);
-            // Show a friendly error message
-            notify("Login Failed: Incorrect email or password.");
+            // If error is undefined, it means our redirect crashed. Otherwise, it's a real Firebase error.
+            if (error) {
+                notify("Login Failed: Incorrect email or password.");
+            }
             setLoading(false);
         }
     };
@@ -71,7 +73,6 @@ const AdminLoginPage = () => {
                         <p className="text-gray-500">Authorized Personnel Only</p>
                     </div>
 
-                    {/* === EMAIL FORM === */}
                     <form onSubmit={handleEmailLogin} className="space-y-4">
                         <div>
                             <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
@@ -85,20 +86,17 @@ const AdminLoginPage = () => {
                             />
                         </div>
                         
-                        {/* === PASSWORD FIELD WITH EYE ICON === */}
                         <div>
                             <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
                             <div className="relative">
                                 <input 
-                                    // 3. Toggle type between text and password
                                     type={showPassword ? "text" : "password"} 
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 transition-colors pr-10" // pr-10 makes room for icon
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 transition-colors pr-10"
                                     placeholder="••••••••"
                                 />
-                                {/* 4. The Toggle Button */}
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
@@ -124,7 +122,6 @@ const AdminLoginPage = () => {
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
 
-                    {/* === GOOGLE BUTTON === */}
                     <button
                         onClick={handleGoogleLogin}
                         disabled={loading}

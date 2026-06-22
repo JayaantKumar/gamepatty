@@ -9,13 +9,11 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180.png', 'masked-icon.svg'],
       
-      // === THE FIX: INCREASE CACHE LIMIT TO 5MB ===
       workbox: {
         maximumFileSizeToCacheInBytes: 5000000
       },
-      // ============================================
 
       manifest: {
         name: 'GamePatty Admin',
@@ -23,21 +21,23 @@ export default defineConfig({
         description: 'GamePatty Portfolio & Admin Panel',
         theme_color: '#000000',
         background_color: '#000000',
-        display: 'standalone', // This removes the browser URL bar
+        display: 'standalone', 
         orientation: 'portrait',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            // Updated to match your actual file name
+            src: 'favicon-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            // Updated to match your actual file name
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
